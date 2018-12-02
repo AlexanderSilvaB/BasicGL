@@ -7,7 +7,7 @@ using namespace std;
 void rotate(BasicGLElements elements, BasicGLWindow *window, float ellasedTime)
 {
     BasicGLElement *heart = elements[0];
-    float scale = 0.05f + ABS(sin(2 * M_PI * window->timeSinceBegin));
+    float scale = 0.5f + 0.5f*ABS(sin(2 * M_PI * window->timeSinceBegin));
     heart->scaleTo( scale );
 }
 
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     {
         float t = (i / 360.0f) * 2 * M_PI;
         float x = 0.03f * (16*sin(t)*sin(t)*sin(t));
-        float y = 0.03f * (13*cos(t) - 5*cos(2*t) - 2*cos(3*t) - cos(4*t));
+        float y = -0.03f * (13*cos(t) - 5*cos(2*t) - 2*cos(3*t) - cos(4*t));
         heart->points[i].moveTo(x, y, 0);
         heart->points[i].rgb(1.0f);
     }
