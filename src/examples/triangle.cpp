@@ -1,15 +1,19 @@
-#include <basicgl/BasicGL.h>
+#include <iostream>
 #include <cmath>
+#include <basicgl/Manager.hpp>
+
+using namespace BasicGL;
+using namespace std;
 
 int main(int argc, char *argv[])
 {
-    BasicGL::Init(argc, argv);
+    Manager::Init(argc, argv);
+    Manager::CreateWindow("Triangle", MODE_2D);
+    Manager::SetBackground(13, 40, 53);
+    Manager::SetCartesian(false);
 
-    BasicGL::CreateWindow("Triangle", MODE_2D);
-    BasicGL::SetBackground(13, 40, 53);
+    Manager::CreateElement(TRIANGLE);
 
-    BasicGL::CreateElement(ELEMENT_TRIANGLE);
-
-    BasicGL::Run();
+    Manager::Show();
     return 0;
 }

@@ -1,21 +1,23 @@
-#include <basicgl/BasicGL.h>
+#include <basicgl/Manager.hpp>
 #include <cmath>
 
-void rotate(BasicGLElements elements, BasicGLWindow *window, float ellasedTime)
+using namespace BasicGL;
+
+void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
 {
-    BasicGLElement *teapot = elements[0];
-    teapot->rotate( 0, ellasedTime );
+    ElementPtr teapot = elements[0];
+    teapot->rotate( 0, 2 * M_PI * ellasedTime );
 }
 
 int main(int argc, char *argv[])
 {
-    BasicGL::Init(argc, argv);
+    Manager::Init(argc, argv);
 
-    BasicGL::CreateWindow("Teapot", MODE_3D);
-	BasicGL::SetAnimationFunction(rotate);
+    Manager::CreateWindow("Teapot", MODE_3D);
+	Manager::SetAnimationFunction(rotate);
 
-    BasicGL::CreateElement(ELEMENT_TEAPOT);
+    Manager::CreateElement(TEAPOT);
 
-    BasicGL::Run();
+    Manager::Show();
     return 0;
 }

@@ -15,3 +15,9 @@ target_link_libraries(snowman basicgl)
 
 add_executable(teapot teapot.cpp)
 target_link_libraries(teapot basicgl)
+
+add_executable(plot plot.cpp)
+target_link_libraries(plot basicgl)
+
+add_executable(robot robot.cpp)
+target_link_libraries(robot basicgl)
