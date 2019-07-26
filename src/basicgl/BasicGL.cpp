@@ -1,7 +1,10 @@
 #include "BasicGL.h"
 #include <GL/freeglut.h>
+#include <GL/freeglut_ext.h>
 #include <GL/gl.h>
 #include <iostream>
+#include <cmath>
+#include <unistd.h>
 
 using namespace std;
 
@@ -37,6 +40,7 @@ int BasicGL::CreateWindow(const char *name, int mode, int width, int height, int
     window.index = currentWindow;
     window.mode = mode;
     window.timeSinceBegin = 0;
+    window.opened = true;
     windows.push_back(window);
 
     glutIdleFunc(Render);
@@ -47,6 +51,7 @@ int BasicGL::CreateWindow(const char *name, int mode, int width, int height, int
     glutMotionFunc(MouseMotion);
     glutEntryFunc(MouseEntry);
     glutTimerFunc(33, Timer, currentWindow);
+    glutCloseFunc(Closed);
 
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
@@ -68,6 +73,11 @@ void BasicGL::SelectWindow(int index)
         currentWindow = index;
 }
 
+bool BasicGL::IsOpen()
+{
+    return windows[currentWindow].opened;
+}
+
 void BasicGL::SetBackground(float r, float g, float b, float a)
 {
     windows[currentWindow].bg[0] = r;
@@ -81,7 +91,12 @@ void BasicGL::SetBackground(int r, int g, int b, int a)
     SetBackground(r/255.0f, g/255.0f, b/255.0f, a/255.0f);
 }
 
-BasicGLElement* BasicGL::CreateElement(int element)
+void BasicGL::SetCartesian(bool cartesian)
+{
+    windows[currentWindow].cartesian = cartesian;
+}
+
+BasicGLElement* BasicGL::CreateElement(int element, bool addToDrawer)
 {
     BasicGLElement* el = new BasicGLElement();
     el->element = element;
@@ -89,19 +104,17 @@ BasicGLElement* BasicGL::CreateElement(int element)
     switch(el->element)
     {
         case ELEMENT_POINT:
+        case ELEMENT_LINE:
+        case ELEMENT_TRIANGLE:
+        case ELEMENT_QUAD:
             el->reshape(1);
             break;
-        case ELEMENT_LINE:
-            el->reshape(2);
-            break;
-        case ELEMENT_TRIANGLE:
-            el->reshape(3);
-            break;
-        case ELEMENT_QUAD:
-            el->reshape(4);
-            break;
         case ELEMENT_POLYGON:
+        case ELEMENT_SEQUENCE:
             el->reshape(0);
+            break;
+        case ELEMENT_CIRCLE:
+            el->reshape(36);
             break;
         default:
             el->reshape(0);
@@ -111,69 +124,86 @@ BasicGLElement* BasicGL::CreateElement(int element)
     switch(el->element)
     {
         case ELEMENT_POINT:
-            el->points[0].xyz[0] = 0;
-            el->points[0].xyz[1] = 0;
-            el->points[0].xyz[2] = 0;
+            el->point(0, 0, 0);
+            el->glow();
             break;
         case ELEMENT_LINE:
-            el->points[0].xyz[0] = -0.5f;
-            el->points[0].xyz[1] = 0;
-            el->points[0].xyz[2] = 0;
-
-            el->points[1].xyz[0] = 0.5f;
-            el->points[1].xyz[1] = 0;
-            el->points[1].xyz[2] = 0;
-
-            el->points[0].color[1] = el->points[0].color[2] = 0.0;
-            el->points[1].color[0] = el->points[1].color[2] = 0.0;
+            el->line(-0.5f, 0, 0, 0.5f, 0, 0);
+            el->glow();
             break;
         case ELEMENT_TRIANGLE:
-            el->points[0].xyz[0] = 0;
-            el->points[0].xyz[1] = -0.5f;
-            el->points[0].xyz[2] = 0;
-
-            el->points[1].xyz[0] = -0.5f;
-            el->points[1].xyz[1] = 0.5f;
-            el->points[1].xyz[2] = 0;
-
-            el->points[2].xyz[0] = 0.5f;
-            el->points[2].xyz[1] = 0.5f;
-            el->points[2].xyz[2] = 0;
-
-            el->points[0].color[1] = el->points[0].color[2] = 0.0;
-            el->points[1].color[0] = el->points[1].color[2] = 0.0;
-            el->points[2].color[0] = el->points[2].color[1] = 0.0;
+            el->triangle(0, -0.5f, 0, -0.5f, 0.5f, 0, 0.5f, 0.5f, 0);
+            el->glow();
             break;
         case ELEMENT_QUAD:
-            el->points[0].xyz[0] = -0.5f;
-            el->points[0].xyz[1] = -0.5f;
-            el->points[0].xyz[2] = 0;
-
-            el->points[1].xyz[0] = 0.5f;
-            el->points[1].xyz[1] = -0.5f;
-            el->points[1].xyz[2] = 0;
-
-            el->points[2].xyz[0] = 0.5f;
-            el->points[2].xyz[1] = 0.5f;
-            el->points[2].xyz[2] = 0;
-
-            el->points[3].xyz[0] = -0.5f;
-            el->points[3].xyz[1] = 0.5f;
-            el->points[3].xyz[2] = 0;
-
-            el->points[0].color[1] = el->points[0].color[2] = 0.0;
-            el->points[1].color[0] = el->points[1].color[2] = 0.0;
-            el->points[2].color[0] = el->points[2].color[1] = 0.0;
+            el->quad(-0.5f, -0.5f, 0, 0.5f, 0.5f, 0);
+            el->glow();
             break;
         case ELEMENT_POLYGON:
+            break;
+        case ELEMENT_SEQUENCE:
+            break;
+        case ELEMENT_CIRCLE:
+            el->circle(0, 0, 0, 0.5f);
+            el->glow();
             break;
         default:
             break;
     }
 
-    windows[currentWindow].elements.push_back(el);
+    if(addToDrawer)
+        windows[currentWindow].elements.push_back(el);
 
     return el;
+}
+
+BasicGLPlot* BasicGL::CreatePlot(int rows, int cols, int index)
+{
+    BasicGLPlot* plt = new BasicGLPlot();
+    plt->element = ELEMENT_CONTAINER;
+    plt->rows = rows;
+    plt->cols = cols;
+
+    if(index <= 0)
+        index = 1;
+        
+    index--;
+
+    plt->index = index;
+
+    int iY = index / rows;
+    int iX = index % rows;
+    
+
+    plt->minX = -1.0f + (2.0f / cols) * iX;
+    plt->maxX = plt->minX + (2.0f / cols);
+
+    plt->minY = -1.0f + (2.0f / rows) * iY;
+    plt->maxY = plt->minY + (2.0f / rows);
+
+    BasicGLElement *bg = CreateElement(ELEMENT_QUAD);
+    float ratioX = (plt->maxX - plt->minX);
+    float ratioY = (plt->maxY - plt->minY);
+    bg->scaleTo(0.95 * ratioX, 0.95 * ratioY, 1.0f);
+    bg->moveTo(0.5f * (plt->minX + plt->maxX), 0.5f * (plt->minY + plt->maxY), 0);
+    bg->rgb(1.0f, 1.0f, 1.0f);
+
+    BasicGLElement *lines = CreateElement(ELEMENT_LINE);
+    lines->reshape(2);
+    lines->line(-0.5, 0.5, -0.5, -0.5, 0);
+    lines->line(-0.5, -0.5, 0.5, -0.5, 1);
+    lines->rgb(0.0f, 0.0f, 0.0f);
+    lines->scaleTo(0.91f * ratioX, 0.91f * ratioY, 1.0f);
+    lines->moveTo(0.5f * (plt->minX + plt->maxX), 0.5f * (plt->minY + plt->maxY), 0);
+
+    plt->assoc = lines;
+    lines->assoc = bg;  
+
+    //windows[currentWindow].elements.push_back(bg);
+    //windows[currentWindow].elements.push_back(lines);
+    windows[currentWindow].elements.push_back(plt);
+
+    return plt;
 }
 
 void BasicGL::SetAnimationFunction(AnimationFunction animationFunction)
@@ -186,9 +216,16 @@ void BasicGL::SetKeyboardFunction(KeyboardFunction keyboardFunction)
     windows[currentWindow].keyboardFunction = keyboardFunction;
 }
 
-void BasicGL::Run()
+void BasicGL::Show()
 {
     glutMainLoop();
+}
+
+void BasicGL::Pause(float seconds)
+{
+    glutMainLoopEvent();
+    Render();
+    usleep((useconds_t)(seconds * 1000000));
 }
 
 int BasicGL::WindowIndex()
@@ -213,6 +250,7 @@ void BasicGL::Resize(GLsizei w, GLsizei h)
         return;
     
     BasicGLWindow &window = windows[index];
+    float flipY = window.cartesian ? -1.0f : 1.0f;
 
     glViewport(0, 0, w, h);
 
@@ -231,7 +269,7 @@ void BasicGL::Resize(GLsizei w, GLsizei h)
     else
     {
 
-        gluOrtho2D (-1.0f*fAspect, 1.0f*fAspect, 1.0f, -1.0f);
+        gluOrtho2D (-1.0f*fAspect, 1.0f*fAspect*flipY, 1.0f, -1.0f*flipY);
     }
 }
 
@@ -368,6 +406,16 @@ void BasicGL::Timer(int index)
     glutTimerFunc(33, Timer, index);
 }
 
+void BasicGL::Closed()
+{
+    int index = WindowIndex();
+    if(index < 0)
+        return;
+    
+    BasicGLWindow &window = windows[index];
+    window.opened = false;
+}
+
 void BasicGL::Render()
 {
     int index = WindowIndex();
@@ -407,6 +455,14 @@ void BasicGL::Render()
 // Elements
 void BasicGLElement::draw()
 {
+    if(!visible)
+        return;
+    if(assoc != NULL)
+    {
+        glPushMatrix();
+        assoc->draw();
+        glPopMatrix();
+    }
     int n = 0;
     bool withBegin = true;
     GLenum t = GL_POINTS;
@@ -418,20 +474,40 @@ void BasicGLElement::draw()
             glPointSize(scales[0]);
             break;
         case ELEMENT_LINE:
-            n = 2;
+            n = size;
             t = GL_LINES;
             break;
         case ELEMENT_TRIANGLE:
             n = 3;
-            t = GL_TRIANGLES;
+            if(wireframe)
+                t = GL_LINE_LOOP;
+            else
+                t = GL_TRIANGLES;
             break;
         case ELEMENT_QUAD:
             n = 4;
-            t = GL_QUADS;
+            if(wireframe)
+                t = GL_LINE_LOOP;
+            else
+                t = GL_QUADS;
             break;
         case ELEMENT_POLYGON:
             n = size;
-            t = GL_POLYGON;
+            if(wireframe)
+                t = GL_LINE_LOOP;
+            else
+                t = GL_POLYGON;
+            break;
+        case ELEMENT_SEQUENCE:
+            n = size;
+            t = GL_LINE_STRIP;
+            break;
+        case ELEMENT_CIRCLE:
+            n = size;
+            if(wireframe)
+                t = GL_LINE_LOOP;
+            else
+                t = GL_POLYGON;
             break;
         case ELEMENT_SPHERE:
         case ELEMENT_CONE:
@@ -448,11 +524,13 @@ void BasicGLElement::draw()
     }
 
 
+
+    glLineWidth(lineWidth);
     glTranslatef(position[0], position[1], position[2]);
     glScalef(scales[0], scales[1], scales[2]);
-    glRotatef(360.0f * rotation[0], 1.0f, 0.0f, 0.0f);
-    glRotatef(360.0f * rotation[1], 0.0f, 1.0f, 0.0f);
-    glRotatef(360.0f * rotation[2], 0.0f, 0.0f, 1.0f);
+    glRotatef(57.2958f * rotation[0], 1.0f, 0.0f, 0.0f);
+    glRotatef(57.2958f * rotation[1], 0.0f, 1.0f, 0.0f);
+    glRotatef(57.2958f * rotation[2], 0.0f, 0.0f, 1.0f);
     if(withBegin)
     {
         glBegin(t);
@@ -469,142 +547,249 @@ void BasicGLElement::draw()
         switch(element)
         {
             case ELEMENT_SPHERE:
-                if(wirefrane)
+                if(wireframe)
                     glutWireSphere(1.0f, 20, 20);
                 else
                     glutSolidSphere(1.0f, 20, 20);
                 break;
             case ELEMENT_CONE:
-                if(wirefrane)
+                if(wireframe)
                     glutWireCone(0.5f, 1.0f, 20, 20);
                 else
                     glutSolidCone(0.5f, 1.0f, 20, 20);
                 break;
             case ELEMENT_CUBE:
-                if(wirefrane)
+                if(wireframe)
                     glutWireCube(1.0f);
                 else
                     glutSolidCube(1.0f);
                 break;
             case ELEMENT_CYLINDER:
-                if(wirefrane)
+                if(wireframe)
                     glutWireCylinder(0.5f, 1.0f, 20, 20);
                 else
                     glutSolidCylinder(0.5f, 1.0f, 20, 20);
                 break;
             case ELEMENT_TEAPOT:
-                if(wirefrane)
+                if(wireframe)
                     glutWireTeapot(1.0f);
                 else
                     glutSolidTeapot(1.0f);
                 break;
+            /*
             case ELEMENT_CONTAINER:
             {
                 for(list<BasicGLElement*>::iterator i = elements.begin(); i != elements.end(); i++)
                 {
+                    if(dynamic_cast<BasicGLPlot*>(this) && dynamic_cast<BasicGLPlotSerie*>(*i))
+                    {
+                        BasicGLPlot *plt = (BasicGLPlot*) this;
+
+                        BasicGLPlotSerie *serie = (BasicGLPlotSerie*) *i;
+                        if(!serie->aligned)
+                        {
+                            if(plt->fixedAxis)
+                            {
+                                serie->minX = plt->axisMinX;
+                                serie->maxX = plt->axisMaxX;
+                                serie->minY = plt->axisMinY;
+                                serie->maxY = plt->axisMaxY;
+                            }
+                            serie->align(plt->minX, plt->maxX, plt->minY, plt->maxY, serie->color);
+                            serie->aligned = true;
+                        }
+                    }
                     glPushMatrix();
                     (*i)->draw();
                     glPopMatrix();
                 }
             }
                 break;
+            */
             default:
                 break;
         }   
+    }
+    glColor4fv(color);
+    for(list<BasicGLElement*>::iterator i = elements.begin(); i != elements.end(); i++)
+    {
+        if(dynamic_cast<BasicGLPlot*>(this) && dynamic_cast<BasicGLPlotSerie*>(*i))
+        {
+            BasicGLPlot *plt = (BasicGLPlot*) this;
+
+            BasicGLPlotSerie *serie = (BasicGLPlotSerie*) *i;
+            if(!serie->aligned)
+            {
+                if(plt->fixedAxis)
+                {
+                    serie->minX = plt->axisMinX;
+                    serie->maxX = plt->axisMaxX;
+                    serie->minY = plt->axisMinY;
+                    serie->maxY = plt->axisMaxY;
+                }
+                serie->align(plt->minX, plt->maxX, plt->minY, plt->maxY, serie->color);
+                serie->aligned = true;
+            }
+        }
+        glPushMatrix();
+        (*i)->draw();
+        glPopMatrix();
     }
 }
 
 BasicGLElement* BasicGLElement::CreateElement(int element)
 {
-    BasicGLElement* el = new BasicGLElement();
-    el->element = element;
-
-    switch(el->element)
-    {
-        case ELEMENT_POINT:
-            el->reshape(1);
-            break;
-        case ELEMENT_LINE:
-            el->reshape(2);
-            break;
-        case ELEMENT_TRIANGLE:
-            el->reshape(3);
-            break;
-        case ELEMENT_QUAD:
-            el->reshape(4);
-            break;
-        case ELEMENT_POLYGON:
-            el->reshape(0);
-            break;
-        default:
-            el->reshape(0);
-            break;
-    }
-    
-    switch(el->element)
-    {
-        case ELEMENT_POINT:
-            el->points[0].xyz[0] = 0;
-            el->points[0].xyz[1] = 0;
-            el->points[0].xyz[2] = 0;
-            break;
-        case ELEMENT_LINE:
-            el->points[0].xyz[0] = -0.5f;
-            el->points[0].xyz[1] = 0;
-            el->points[0].xyz[2] = 0;
-
-            el->points[1].xyz[0] = 0.5f;
-            el->points[1].xyz[1] = 0;
-            el->points[1].xyz[2] = 0;
-
-            el->points[0].color[1] = el->points[0].color[2] = 0.0;
-            el->points[1].color[0] = el->points[1].color[2] = 0.0;
-            break;
-        case ELEMENT_TRIANGLE:
-            el->points[0].xyz[0] = 0;
-            el->points[0].xyz[1] = -0.5f;
-            el->points[0].xyz[2] = 0;
-
-            el->points[1].xyz[0] = -0.5f;
-            el->points[1].xyz[1] = 0.5f;
-            el->points[1].xyz[2] = 0;
-
-            el->points[2].xyz[0] = 0.5f;
-            el->points[2].xyz[1] = 0.5f;
-            el->points[2].xyz[2] = 0;
-
-            el->points[0].color[1] = el->points[0].color[2] = 0.0;
-            el->points[1].color[0] = el->points[1].color[2] = 0.0;
-            el->points[2].color[0] = el->points[2].color[1] = 0.0;
-            break;
-        case ELEMENT_QUAD:
-            el->points[0].xyz[0] = -0.5f;
-            el->points[0].xyz[1] = -0.5f;
-            el->points[0].xyz[2] = 0;
-
-            el->points[1].xyz[0] = 0.5f;
-            el->points[1].xyz[1] = -0.5f;
-            el->points[1].xyz[2] = 0;
-
-            el->points[2].xyz[0] = 0.5f;
-            el->points[2].xyz[1] = 0.5f;
-            el->points[2].xyz[2] = 0;
-
-            el->points[3].xyz[0] = -0.5f;
-            el->points[3].xyz[1] = 0.5f;
-            el->points[3].xyz[2] = 0;
-
-            el->points[0].color[1] = el->points[0].color[2] = 0.0;
-            el->points[1].color[0] = el->points[1].color[2] = 0.0;
-            el->points[2].color[0] = el->points[2].color[1] = 0.0;
-            break;
-        case ELEMENT_POLYGON:
-            break;
-        default:
-            break;
-    }
-
+    BasicGLElement* el = BasicGL::CreateElement(element, false);
     elements.push_back(el);
-
     return el;
+}
+
+// Plot
+void getColor(const string opts, float *color)
+{
+    color[0] = color[1] = color[2] = 0.0f;
+    color[3] = 1.0f;
+    for(int i = 0; i < opts.size(); i++)
+    {
+        switch (opts[i])
+        {
+            case 'k':
+            case 'K':
+                color[0] = color[1] = color[2] = 0.0f;
+                break;
+            case 'r':
+            case 'R':
+                color[0] = 1.0f;
+                color[1] = color[2] = 0.0f;
+                break;
+            case 'g':
+            case 'G':
+                color[1] = 1.0f;
+                color[0] = color[2] = 0.0f;
+                break;
+            case 'b':
+            case 'B':
+                color[2] = 1.0f;
+                color[0] = color[1] = 0.0f;
+                break;
+            case 'w':
+            case 'W':
+                color[0] = color[1] = color[2] = 1.0f;
+                break;
+            case 'm':
+            case 'M':
+                color[1] = 0.0f;
+                color[0] = color[2] = 1.0f;
+                break;
+            case 'c':
+            case 'C':
+                color[0] = 0.0f;
+                color[1] = color[2] = 1.0f;
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+BasicGLPlotSerie* BasicGLPlot::createSerie(const string opts)
+{
+    BasicGLPlotSerie* serie = new BasicGLPlotSerie();
+    serie->element = ELEMENT_SEQUENCE;
+    elements.push_back(serie);
+    getColor(opts, serie->color);
+    return serie;
+}
+
+BasicGLPlotSerie* BasicGLPlot::plot(vector<float> &x, vector<float> &y, const string opts)
+{
+    BasicGLPlotSerie* serie = createSerie(opts);
+    serie->update(x, y);
+    return serie;
+}
+
+BasicGLPlot* BasicGLPlot::axis(float minX, float maxX, float minY, float maxY)
+{
+    this->fixedAxis = true;
+    this->axisMinX = minX;
+    this->axisMaxX = maxX;
+    this->axisMinY = minY;
+    this->axisMaxY = maxY;
+    for(list<BasicGLElement*>::iterator i = elements.begin(); i != elements.end(); i++)
+    {
+        if(dynamic_cast<BasicGLPlotSerie*>(*i))
+        {
+            BasicGLPlotSerie *serie = (BasicGLPlotSerie*) *i;
+            serie->aligned = false;
+        }
+    }
+    return this;
+}
+
+BasicGLPlotSerie* BasicGLPlotSerie::add(float x, float y)
+{
+    BasicGLPoint pt;
+    pt.moveTo(x, y, 0);
+    pt.rgb(color[0], color[1], color[2], color[3]);
+    points.push_back(pt);
+    size++;
+    if(size == 1)
+    {
+        minX = maxX = x;
+        minY = maxY = y;
+    }
+    else
+    {
+        if(x < minX)
+            minX = x;
+        if(x > maxX)
+            maxX = x;
+        if(y < minY)
+            minY = y;
+        if(y > maxY)
+            maxY = y;
+    }
+    aligned = false;
+    return this;
+}
+
+BasicGLPlotSerie* BasicGLPlotSerie::update(vector<float> &x, vector<float> &y)
+{
+    int sz = min(x.size(), y.size());
+    reshape(sz);
+    for(int i = 0; i < sz; i++)
+    {
+        points[i].moveTo(x[i], y[i], 0);
+        points[i].rgb(color[0], color[1], color[2], color[3]);
+        if(i == 0)
+        {
+            minX = maxX = x[i];
+            minY = maxY = y[i];
+        }
+        else
+        {
+            if(x[i] < minX)
+                minX = x[i];
+            if(x[i] > maxX)
+                maxX = x[i];
+            if(y[i] < minY)
+                minY = y[i];
+            if(y[i] > maxY)
+                maxY = y[i];
+        }
+    }
+    aligned = false;
+    return this;
+}
+
+void BasicGLPlotSerie::align(float minX, float maxX, float minY, float maxY, float *color)
+{
+    float ratioX = (maxX - minX) / (this->maxX - this->minX);
+    float ratioY = (maxY - minY) / (this->maxY - this->minY);
+    float sx = ratioX * 0.9;
+    float sy = ratioY * 0.9;
+    float x = 0.5f * (minX + maxX) - (0.5f * (this->minX + this->maxX)) * sx;
+    float y = 0.5f * (minY + maxY) - (0.5f * (this->minY + this->maxY)) * sy;
+    moveTo(x, y, 0);
+    scaleTo(sx, sy, 1.0f);
 }
