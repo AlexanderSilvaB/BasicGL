@@ -1,6 +1,7 @@
 #include "Element.hpp"
 #include "Serie.hpp"
 #include "Plot.hpp"
+#include "Manager.hpp"
 #include <cmath>
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
@@ -21,6 +22,9 @@ Element::Element(Elements element) : element(element)
     lineWidth = 1.0f;
     color[0] = color[1] = color[2] = color[3] = 1.0f;
     data = NULL;
+    text = "";
+    font = Default8x13;
+    alignment = Left;
     init();
 }
 
@@ -368,6 +372,55 @@ ElementPtr Element::circle(float x, float y, float z, float r)
     return this;
 }
 
+ElementPtr Element::setText(const string& text, Fonts font = Default8x13)
+{
+    this->text = text;
+    this->font = font;
+}
+
+float Element::getTextWidth()
+{
+    const unsigned char* txt = (unsigned char*)text.c_str();
+    return glutBitmapLength(getFont(), txt);
+}
+
+float Element::getTextHeight()
+{
+    float ret = 13;
+    switch(font)
+    {
+        case Default8x13:
+            ret = 13;
+            break;
+        case Default9x15:
+            ret = 15;
+            break;
+        case TimesRoman10:
+            ret = 10;
+            break;
+        case TimesRoman24:
+            ret = 24;
+            break;
+        case Helvetica10:
+            ret = 10;
+            break;
+        case Helvetica12:
+            ret = 12;
+            break;
+        case Helvetica18:
+            ret = 18;
+            break;
+        default:
+            break;
+    }
+    return ret;
+}
+
+ElementPtr Element::textAlign(int alignment)
+{
+    this->alignment = alignment;
+}
+
 ElementPtr Element::glow()
 {
     float step = 360.0f / points.size();
@@ -376,6 +429,38 @@ ElementPtr Element::glow()
         hsvTorgb(step*i, 1.0f, 1.0f, points[i].color);
     }
     return this;
+}
+
+void* Element::getFont()
+{
+    void* ret = GLUT_BITMAP_8_BY_13;
+    switch(font)
+    {
+        case Default8x13:
+            ret = GLUT_BITMAP_8_BY_13;
+            break;
+        case Default9x15:
+            ret = GLUT_BITMAP_9_BY_15;
+            break;
+        case TimesRoman10:
+            ret = GLUT_BITMAP_TIMES_ROMAN_10;
+            break;
+        case TimesRoman24:
+            ret = GLUT_BITMAP_TIMES_ROMAN_24;
+            break;
+        case Helvetica10:
+            ret = GLUT_BITMAP_HELVETICA_10;
+            break;
+        case Helvetica12:
+            ret = GLUT_BITMAP_HELVETICA_12;
+            break;
+        case Helvetica18:
+            ret = GLUT_BITMAP_HELVETICA_18;
+            break;
+        default:
+            break;
+    }
+    return ret;
 }
 
 void Element::hsvTorgb(float h, float s, float v, float *rgb)
@@ -475,62 +560,85 @@ void Element::draw()
             break;
     }
 
-
-
     glLineWidth(lineWidth);
     glTranslatef(position[0], position[1], position[2]);
     glScalef(scales[0], scales[1], scales[2]);
     glRotatef(57.2958f * rotation[0], 1.0f, 0.0f, 0.0f);
     glRotatef(57.2958f * rotation[1], 0.0f, 1.0f, 0.0f);
     glRotatef(57.2958f * rotation[2], 0.0f, 0.0f, 1.0f);
-    if(withBegin)
+
+    if(element == TEXT)
     {
-        glBegin(t);
-        for(int i = 0; i < n; i++)
+        float tx = 0, ty = 0, tz = 0;
+        if(alignment & CenterX)
+            tx = - (getTextWidth()/Manager::WindowWidth());
+        else if(alignment & Right)
+            tx = - 2*(getTextWidth()/Manager::WindowWidth());
+        if(alignment & CenterY)
+            ty = -0.5f*(getTextHeight()/Manager::WindowHeight());
+        else if(alignment & Top)
+            ty = -(getTextHeight()/Manager::WindowHeight());
+
+        glRasterPos3f(tx, ty, tz);
+        glColor4fv(color);
+        int len = text.length();
+        void* font = getFont();
+        for (int i = 0; i < len; i++) 
         {
-            glColor4fv(points[i].color);
-            glVertex3f(points[i].xyz[0], points[i].xyz[1], points[i].xyz[2]);
+            glutBitmapCharacter(font, text[i]);
         }
-        glEnd();
     }
     else
     {
-        glColor4fv(color);
-        switch(element)
+        if(withBegin)
         {
-            case SPHERE:
-                if(wireframe)
-                    glutWireSphere(1.0f, 20, 20);
-                else
-                    glutSolidSphere(1.0f, 20, 20);
-                break;
-            case CONE:
-                if(wireframe)
-                    glutWireCone(0.5f, 1.0f, 20, 20);
-                else
-                    glutSolidCone(0.5f, 1.0f, 20, 20);
-                break;
-            case CUBE:
-                if(wireframe)
-                    glutWireCube(1.0f);
-                else
-                    glutSolidCube(1.0f);
-                break;
-            case CYLINDER:
-                if(wireframe)
-                    glutWireCylinder(0.5f, 1.0f, 20, 20);
-                else
-                    glutSolidCylinder(0.5f, 1.0f, 20, 20);
-                break;
-            case TEAPOT:
-                if(wireframe)
-                    glutWireTeapot(1.0f);
-                else
-                    glutSolidTeapot(1.0f);
-                break;
-            default:
-                break;
-        }   
+            glBegin(t);
+            for(int i = 0; i < n; i++)
+            {
+                glColor4fv(points[i].color);
+                glVertex3f(points[i].xyz[0], points[i].xyz[1], points[i].xyz[2]);
+            }
+            glEnd();
+        }
+        else
+        {
+            glColor4fv(color);
+            switch(element)
+            {
+                case SPHERE:
+                    if(wireframe)
+                        glutWireSphere(1.0f, 20, 20);
+                    else
+                        glutSolidSphere(1.0f, 20, 20);
+                    break;
+                case CONE:
+                    if(wireframe)
+                        glutWireCone(0.5f, 1.0f, 20, 20);
+                    else
+                        glutSolidCone(0.5f, 1.0f, 20, 20);
+                    break;
+                case CUBE:
+                    if(wireframe)
+                        glutWireCube(1.0f);
+                    else
+                        glutSolidCube(1.0f);
+                    break;
+                case CYLINDER:
+                    if(wireframe)
+                        glutWireCylinder(0.5f, 1.0f, 20, 20);
+                    else
+                        glutSolidCylinder(0.5f, 1.0f, 20, 20);
+                    break;
+                case TEAPOT:
+                    if(wireframe)
+                        glutWireTeapot(1.0f);
+                    else
+                        glutSolidTeapot(1.0f);
+                    break;
+                default:
+                    break;
+            }   
+        }
     }
     glColor4fv(color);
     for(int i = 0; i < elements.size(); i++)

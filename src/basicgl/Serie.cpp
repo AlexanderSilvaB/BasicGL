@@ -9,6 +9,13 @@ Serie::Serie() : Element(SEQUENCE)
 {
     aligned = false;
     rgb(0.0f, 0.0f, 0.0f);
+    name = "Serie";
+}
+
+Serie::Serie(const string& name) : name(name), Element(SEQUENCE)
+{
+    aligned = false;
+    rgb(0.0f, 0.0f, 0.0f);
 }
 
 Serie::~Serie()

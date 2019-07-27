@@ -25,8 +25,11 @@ namespace BasicGL
             virtual ~Plot();
 
             SeriePtr createSerie(const std::string opts = "k");
+            SeriePtr createNamedSerie(const std::string& name, const std::string opts = "k");
             SeriePtr plot(std::vector<float> &x, std::vector<float> &y, const std::string opts = "k");
+            SeriePtr plot(const std::string& name, std::vector<float> &x, std::vector<float> &y, const std::string opts = "k");
             SeriePtr plot(std::vector<float> &x, std::vector<float> &y, std::vector<float> &z, const std::string opts = "k");
+            SeriePtr plot(const std::string& name, std::vector<float> &x, std::vector<float> &y, std::vector<float> &z, const std::string opts = "k");
             PlotPtr axis(float minX, float maxX, float minY, float maxY);
             
             PlotPtr background(unsigned char, unsigned char g = 0, unsigned char b = 0, unsigned char a = 255);

@@ -135,6 +135,16 @@ void Manager::Pause(float seconds)
     usleep((useconds_t)(seconds * 1000000));
 }
 
+float Manager::WindowWidth()
+{
+    return windows[currentWindow].width;
+}
+
+float Manager::WindowHeight()
+{
+    return windows[currentWindow].height;
+}
+
 int Manager::WindowIndex()
 {
     int id = glutGetWindow();
@@ -157,6 +167,8 @@ void Manager::Resize(GLsizei w, GLsizei h)
         return;
     
     Window& window = windows[index];
+    window.width = w;
+    window.height = h;
     float flipY = window.cartesian ? -1.0f : 1.0f;
 
     glViewport(0, 0, w, h);

@@ -21,3 +21,6 @@ target_link_libraries(plot basicgl)
 
 add_executable(robot robot.cpp)
 target_link_libraries(robot basicgl)
+
+add_executable(text text.cpp)
+target_link_libraries(text basicgl)

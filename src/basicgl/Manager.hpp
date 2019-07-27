@@ -29,6 +29,8 @@ namespace BasicGL
             static void SetMouseFunction(MouseFunction mouseFunction);
             static void SetCartesian(bool cartesian);
             static bool IsOpen();
+            static float WindowWidth();
+            static float WindowHeight();
 
             static Element* CreateElement(Elements element, bool addToDrawer = true);
             static Plot* CreatePlot(int rows = 1, int cols = 1, int index = 1);

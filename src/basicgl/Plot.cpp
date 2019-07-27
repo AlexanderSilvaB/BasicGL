@@ -62,6 +62,13 @@ SeriePtr Plot::createSerie(const string opts)
     return serie;
 }
 
+SeriePtr Plot::createNamedSerie(const string& name, const string opts)
+{
+    SeriePtr serie = createSerie(opts);
+    serie->name = name;
+    return serie;
+}
+
 SeriePtr Plot::plot(vector<float> &x, vector<float> &y, const string opts)
 {
     SeriePtr serie = new Serie();
@@ -71,12 +78,26 @@ SeriePtr Plot::plot(vector<float> &x, vector<float> &y, const string opts)
     return serie;
 }
 
+SeriePtr Plot::plot(const string& name, vector<float> &x, vector<float> &y, const string opts)
+{
+    SeriePtr serie = plot(x, y, opts);
+    serie->name = name;
+    return serie;
+}
+
 SeriePtr Plot::plot(vector<float> &x, vector<float> &y, vector<float> &z, const string opts)
 {
     SeriePtr serie(new Serie());
     serie->setColor(opts);
     serie->update(x, y, z);
     elements.push_back(serie);
+    return serie;
+}
+
+SeriePtr Plot::plot(const string& name, vector<float> &x, vector<float> &y, vector<float> &z, const string opts)
+{
+    SeriePtr serie = plot(x, y, z, opts);
+    serie->name = name;
     return serie;
 }
 

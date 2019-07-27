@@ -5,9 +5,19 @@
 #include "Elements.hpp"
 #include <float.h>
 #include <vector>
+#include <string>
 
 namespace BasicGL
 {
+    enum Fonts { Default8x13, Default9x15, TimesRoman10, TimesRoman24, Helvetica10, Helvetica12, Helvetica18 };
+    
+    #define Left 1
+    #define CenterX 2
+    #define Right 4
+    #define Top 8
+    #define CenterY 16
+    #define Bottom 32
+
     class Element;
 
     typedef Element* ElementPtr;
@@ -18,6 +28,7 @@ namespace BasicGL
             Elements element;
             void init();
             static void hsvTorgb(float h, float s, float v, float *rgb);
+            void* getFont();
         public:
             bool visible;
             float lineWidth;
@@ -26,6 +37,9 @@ namespace BasicGL
             float position[3];
             float rotation[3];
             float color[4];
+            std::string text;
+            Fonts font;
+            int alignment;
             ElementPtr assoc;
             std::vector< Point > points;
             std::vector< ElementPtr > elements;
@@ -52,6 +66,11 @@ namespace BasicGL
             virtual ElementPtr rgb(unsigned char r, unsigned char g = 0, unsigned char b = 0, unsigned char a = 255);
             virtual ElementPtr rgb(float r, float g = 0.0f, float b = 0.0f, float a = 1.0f);
             virtual ElementPtr setWireframe(bool wireframe);
+            virtual ElementPtr setText(const std::string& text, Fonts font);
+
+            float getTextWidth();
+            float getTextHeight();
+            ElementPtr textAlign(int alignmenet);
 
             ElementPtr point(float x, float y, int index = 0);
             ElementPtr point(float x, float y, float z, int index = 0);

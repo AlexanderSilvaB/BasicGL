@@ -15,8 +15,10 @@ namespace BasicGL
         public:
             bool aligned;
             float minX, maxX, minY, maxY;
+            std::string name;
 
             Serie();
+            Serie(const std::string& name);
             virtual ~Serie();
             SeriePtr add(float x, float y, float z = 0);
             SeriePtr update(std::vector<float> &x, std::vector<float> &y);

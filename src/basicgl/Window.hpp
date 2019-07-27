@@ -31,6 +31,7 @@ namespace BasicGL
             float timeSinceBegin;
             struct timespec lastTime;
             bool cartesian;
+            float width, height;
         
             std::vector< Element* > elements;
             AnimationFunction animationFunction;
