@@ -37,6 +37,9 @@ namespace BasicGL
 
             static void Show();
             static void Pause(float seconds = 0);
+            static bool IsFullscreen();
+            static void SetFullscreen(bool enabled);
+            static void ToggleFullscreen();
         
         private:
             static std::vector< Window > windows;

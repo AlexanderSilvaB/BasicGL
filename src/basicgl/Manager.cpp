@@ -123,6 +123,11 @@ void Manager::SetKeyboardFunction(KeyboardFunction keyboardFunction)
     windows[currentWindow].keyboardFunction = keyboardFunction;
 }
 
+void Manager::SetMouseFunction(MouseFunction mouseFunction)
+{
+    windows[currentWindow].mouseFunction = mouseFunction;
+}
+
 void Manager::Show()
 {
     glutMainLoop();
@@ -134,6 +139,21 @@ void Manager::Pause(float seconds)
     Render();
     if(seconds > 0)
         usleep((useconds_t)(seconds * 1000000));
+}
+
+bool Manager::IsFullscreen()
+{
+    windows[currentWindow].IsFullscreen();
+}
+
+void Manager::SetFullscreen(bool enabled)
+{
+    windows[currentWindow].SetFullscreen(enabled);
+}
+
+void Manager::ToggleFullscreen()
+{
+    windows[currentWindow].ToggleFullscreen();
 }
 
 float Manager::WindowWidth()
@@ -203,8 +223,12 @@ void Manager::KeyboardNormal(unsigned char key, int x, int y)
 
     struct Keyboard_st keyboard;
     keyboard.key = key;
-    keyboard.x = x;
-    keyboard.y = y;
+    keyboard.windowX = x;
+    keyboard.windowY = y;
+    keyboard.x = ((x / window.width) - 0.5f) * 2.0f;
+    keyboard.y = ((y / window.height) - 0.5f) * 2.0f;
+    if(window.cartesian)
+        keyboard.y *= -1;
     int mod = glutGetModifiers();
     keyboard.shift = (mod & GLUT_ACTIVE_SHIFT) > 0;
     keyboard.alt = (mod & GLUT_ACTIVE_ALT) > 0;
@@ -224,8 +248,12 @@ void Manager::KeyboardSpecial(int key, int x, int y)
 
     struct Keyboard_st keyboard;
     keyboard.key = key;
-    keyboard.x = x;
-    keyboard.y = y;
+    keyboard.windowX = x;
+    keyboard.windowY = y;
+    keyboard.x = ((x / window.width) - 0.5f) * 2.0f;
+    keyboard.y = ((y / window.height) - 0.5f) * 2.0f;
+    if(window.cartesian)
+        keyboard.y *= -1;
     int mod = glutGetModifiers();
     keyboard.shift = (mod & GLUT_ACTIVE_SHIFT) > 0;
     keyboard.alt = (mod & GLUT_ACTIVE_ALT) > 0;
@@ -247,8 +275,12 @@ void Manager::MouseButtons(int button, int state, int x, int y)
     mouse.left = button == GLUT_LEFT_BUTTON;
     mouse.middle = button == GLUT_MIDDLE_BUTTON;
     mouse.right = button == GLUT_RIGHT_BUTTON;
-    mouse.x = x;
-    mouse.y = y;
+    mouse.windowX = x;
+    mouse.windowY = y;
+    mouse.x = ((x / window.width) - 0.5f) * 2.0f;
+    mouse.y = ((y / window.height) - 0.5f) * 2.0f;
+    if(window.cartesian)
+        mouse.y *= -1;
     mouse.pressed = state == GLUT_DOWN;
     mouse.released = state == GLUT_UP;
     mouse.move = false;
@@ -270,8 +302,12 @@ void Manager::MouseMotion(int x, int y)
     mouse.left = false;
     mouse.middle = false;
     mouse.right = false;
-    mouse.x = x;
-    mouse.y = y;
+    mouse.windowX = x;
+    mouse.windowY = y;
+    mouse.x = ((x / window.width) - 0.5f) * 2.0f;
+    mouse.y = ((y / window.height) - 0.5f) * 2.0f;
+    if(window.cartesian)
+        mouse.y *= -1;
     mouse.pressed = false;
     mouse.released = false;
     mouse.move = true;
@@ -293,6 +329,8 @@ void Manager::MouseEntry(int state)
     mouse.left = false;
     mouse.middle = false;
     mouse.right = false;
+    mouse.windowX = 0;
+    mouse.windowY = 0;
     mouse.x = 0;
     mouse.y = 0;
     mouse.pressed = false;
@@ -367,6 +405,5 @@ void Manager::Render()
         window.elements[i]->draw();
         glPopMatrix();
     }
-
     glutSwapBuffers();
 }

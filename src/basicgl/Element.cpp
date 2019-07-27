@@ -17,12 +17,13 @@ using namespace std;
 
 Element::Element(Elements element) : element(element)
 {
+    assoc = NULL;
     visible = true;
     wireframe = false;
     scales[0] = scales[1] = scales[2] = 1.0f;
     position[0] = position[1] = position[2] = 0;
     rotation[0] = rotation[1] = rotation[2] = 0;
-    lineWidth = 1.0f;
+    stroke = 1.0f;
     color[0] = color[1] = color[2] = color[3] = 1.0f;
     data = NULL;
     text = "";
@@ -49,6 +50,10 @@ void Element::init()
             break;
         case POLYGON:
         case SEQUENCE:
+        case LOOP:
+        case CONNECTED_TRIANGLES:
+        case RADIAL_TRIANGLES:
+        case CONNECTED_RECTANGLES:
             glGenBuffers(2, vboIds);
             reshape(0);
             break;
@@ -235,6 +240,14 @@ ElementPtr Element::setWireframe(bool wireframe)
     return this;
 }
 
+int Element::newPoint(float x, float y, float z)
+{
+    int pt = points.add();
+    points.moveTo(pt, x, y, z);
+    points.rgb(pt, color[0], color[1], color[2], color[3]);
+    return pt;
+}
+
 ElementPtr Element::point(float x, float y, int index)
 {
     if(points.size() > index)
@@ -345,7 +358,7 @@ ElementPtr Element::circle(float x, float y, float z, float r)
     return this;
 }
 
-ElementPtr Element::setText(const string& text, Fonts font = Default8x13)
+ElementPtr Element::setText(const string& text, Fonts font)
 {
     this->text = text;
     this->font = font;
@@ -396,10 +409,27 @@ ElementPtr Element::textAlign(int alignment)
 
 ElementPtr Element::glow()
 {
+    float random = rand() % 360;
+    hsvTorgb(random, 1.0f, 1.0f, color);
+
     float step = 360.0f / points.size();
     for(int i = 0; i < points.size(); i++)
     {
         hsvTorgb(step*i, 1.0f, 1.0f, points.getColor(i).data);
+    }
+    return this;
+}
+
+ElementPtr Element::glow(int index, int pos)
+{
+    if(index < points.size())
+    {
+        float random;
+        if(pos < 0)
+            random = rand() % 360;
+        else
+            random = pos % 360;
+        hsvTorgb(random, 1.0f, 1.0f, points.getColor(index).data);
     }
     return this;
 }
@@ -481,7 +511,6 @@ void Element::draw()
         case POINT:
             n = points.size();
             t = GL_POINTS;
-            glPointSize(scales[0]);
             break;
         case LINE:
             n = points.size();
@@ -512,12 +541,37 @@ void Element::draw()
             n = points.size();
             t = GL_LINE_STRIP;
             break;
+        case LOOP:
+            n = points.size();
+            t = GL_LINE_LOOP;
+            break;
         case CIRCLE:
             n = points.size();
             if(wireframe)
                 t = GL_LINE_LOOP;
             else
                 t = GL_POLYGON;
+            break;
+        case CONNECTED_TRIANGLES:
+            n = points.size();
+            if(wireframe)
+                t = GL_LINE_LOOP;
+            else
+                t = GL_TRIANGLE_STRIP;
+            break;
+        case RADIAL_TRIANGLES:
+            n = points.size();
+            if(wireframe)
+                t = GL_LINE_LOOP;
+            else
+                t = GL_TRIANGLE_FAN;
+            break;
+        case CONNECTED_RECTANGLES:
+            n = points.size();
+            if(wireframe)
+                t = GL_LINE_LOOP;
+            else
+                t = GL_QUAD_STRIP;
             break;
         case SPHERE:
         case CONE:
@@ -533,7 +587,8 @@ void Element::draw()
             break;
     }
 
-    glLineWidth(lineWidth);
+    glPointSize(stroke);
+    glLineWidth(stroke);
     glTranslatef(position[0], position[1], position[2]);
     glScalef(scales[0], scales[1], scales[2]);
     glRotatef(57.2958f * rotation[0], 1.0f, 0.0f, 0.0f);

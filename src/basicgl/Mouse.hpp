@@ -7,7 +7,8 @@ namespace BasicGL
     {
         bool left, middle, right;
         bool pressed, released, move, entered, leave;
-        int x, y;
+        int windowX, windowY;
+        float x, y;
     }&Mouse;
 }
 

@@ -13,7 +13,7 @@ namespace BasicGL
     class Window;
 
     typedef const std::vector< Element* >& ElementsList;
-    typedef const Window* WindowPtr;
+    typedef Window* WindowPtr;
 
     typedef void (*AnimationFunction)(ElementsList elements, WindowPtr window, float ellapsedTime);
     typedef void (*KeyboardFunction)(Keyboard keyboard, WindowPtr window);
@@ -21,11 +21,14 @@ namespace BasicGL
 
     class Window
     {
+        private:
+            int windowedX, windowedY, windowedWidth, windowedHeight;
         public:
             int id;
             int index;
             int mode;
             bool opened;
+            bool fullscren;
             Camera camera;
             float bg[4];
             float timeSinceBegin;
@@ -40,6 +43,10 @@ namespace BasicGL
 
             Window();
             virtual ~Window();
+
+            bool IsFullscreen();
+            void SetFullscreen(bool enabled);
+            void ToggleFullscreen();
     };
 }
 

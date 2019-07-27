@@ -33,7 +33,7 @@ namespace BasicGL
             void* getFont();
         public:
             bool visible;
-            float lineWidth;
+            float stroke;
             bool wireframe;
             float scales[3];
             float position[3];
@@ -68,11 +68,13 @@ namespace BasicGL
             virtual ElementPtr rgb(unsigned char r, unsigned char g = 0, unsigned char b = 0, unsigned char a = 255);
             virtual ElementPtr rgb(float r, float g = 0.0f, float b = 0.0f, float a = 1.0f);
             virtual ElementPtr setWireframe(bool wireframe);
-            virtual ElementPtr setText(const std::string& text, Fonts font);
+            virtual ElementPtr setText(const std::string& text, Fonts font = Fonts::Default8x13);
 
             float getTextWidth();
             float getTextHeight();
             ElementPtr textAlign(int alignmenet);
+
+            int newPoint(float x, float y, float z);
 
             ElementPtr point(float x, float y, int index = 0);
             ElementPtr point(float x, float y, float z, int index = 0);
@@ -85,6 +87,7 @@ namespace BasicGL
             ElementPtr circle(float x, float y, float r);
             ElementPtr circle(float x, float y, float z, float r);
             ElementPtr glow();
+            ElementPtr glow(int index, int pos = -1);
 
             void invalidate();
             void draw();

@@ -28,7 +28,8 @@ namespace BasicGL
     typedef struct Keyboard_st
     {
         int key;
-        int x, y;
+        int windowX, windowY;
+        float x, y;
         bool shift, ctrl, alt;
     }&Keyboard;
 }
