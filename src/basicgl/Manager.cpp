@@ -132,7 +132,8 @@ void Manager::Pause(float seconds)
 {
     glutMainLoopEvent();
     Render();
-    usleep((useconds_t)(seconds * 1000000));
+    if(seconds > 0)
+        usleep((useconds_t)(seconds * 1000000));
 }
 
 float Manager::WindowWidth()

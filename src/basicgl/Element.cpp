@@ -3,11 +3,14 @@
 #include "Plot.hpp"
 #include "Manager.hpp"
 #include <cmath>
+#include <iostream>
+#include <unistd.h>
+
+#define GL_GLEXT_PROTOTYPES
+
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
 #include <GL/gl.h>
-#include <iostream>
-#include <unistd.h>
 
 using namespace BasicGL;
 using namespace std;
@@ -41,13 +44,16 @@ void Element::init()
         case LINE:
         case TRIANGLE:
         case RECTANGLE:
+            glGenBuffers(2, vboIds);
             reshape(1);
             break;
         case POLYGON:
         case SEQUENCE:
+            glGenBuffers(2, vboIds);
             reshape(0);
             break;
         case CIRCLE:
+            glGenBuffers(2, vboIds);
             reshape(36);
             break;
         default:
@@ -202,7 +208,7 @@ ElementPtr Element::rgb(unsigned char r, unsigned char g, unsigned char b, unsig
     color[2] = b/255.0f;
     color[3] = a/255.0f;
     for(int i = 0; i < points.size(); i++)
-        points[i].rgb(r, g, b, a);
+        points.rgb(i, r, g, b, a);
     for(int i = 0; i < elements.size(); i++)
         elements[i]->rgb(r, g, b, a);
     return this;
@@ -215,7 +221,7 @@ ElementPtr Element::rgb(float r, float g, float b, float a)
     color[2] = b;
     color[3] = a;
     for(int i = 0; i < points.size(); i++)
-        points[i].rgb(r, g, b, a);
+        points.rgb(i, r, g, b, a);
     for(int i = 0; i < elements.size(); i++)
         elements[i]->rgb(r, g, b, a);
     return this;
@@ -233,8 +239,7 @@ ElementPtr Element::point(float x, float y, int index)
 {
     if(points.size() > index)
     {
-        points[index].xyz[0] = x;
-        points[index].xyz[1] = y;
+        points.moveTo(index, x, y, points.Z(index));
     }
     return this;
 }
@@ -243,9 +248,7 @@ ElementPtr Element::point(float x, float y, float z, int index)
 {
     if(points.size() > index)
     {
-        points[index].xyz[0] = x;
-        points[index].xyz[1] = y;
-        points[index].xyz[2] = z;
+        points.moveTo(index, x, y, z);
     }
     return this;
 }
@@ -255,10 +258,8 @@ ElementPtr Element::line(float x1, float y1, float x2, float y2, int index)
     index *= 2;
     if(points.size() > index + 1)
     {
-        points[index].xyz[0] = x1;
-        points[index].xyz[1] = y1;
-        points[index+1].xyz[0] = x2;
-        points[index+1].xyz[1] = y2;
+        points.moveTo(index, x1, y1, points.Z(index));
+        points.moveTo(index+1, x2, y2, points.Z(index+1));
     }
     return this;
 }
@@ -268,12 +269,8 @@ ElementPtr Element::line(float x1, float y1, float z1, float x2, float y2, float
     index *= 2;
     if(points.size() > index + 1)
     {
-        points[index].xyz[0] = x1;
-        points[index].xyz[1] = y1;
-        points[index].xyz[2] = z1;
-        points[index+1].xyz[0] = x2;
-        points[index+1].xyz[1] = y2;
-        points[index+1].xyz[2] = z2;
+        points.moveTo(index, x1, y1, z1);
+        points.moveTo(index+1, x2, y2, z2);
     }
     return this;
 }
@@ -283,12 +280,9 @@ ElementPtr Element::triangle(float x1, float y1, float x2, float y2, float x3, f
     index *= 3;
     if(points.size() > index + 2)
     {
-        points[index].xyz[0] = x1;
-        points[index].xyz[1] = y1;
-        points[index+1].xyz[0] = x2;
-        points[index+1].xyz[1] = y2;
-        points[index+2].xyz[0] = x3;
-        points[index+2].xyz[1] = y3;
+        points.moveTo(index, x1, y1, points.Z(index));
+        points.moveTo(index+1, x2, y2, points.Z(index+1));
+        points.moveTo(index+2, x3, y3, points.Z(index+2));
     }
     return this;
 }
@@ -298,15 +292,9 @@ ElementPtr Element::triangle(float x1, float y1, float z1, float x2, float y2, f
     index *= 3;
     if(points.size() > index + 2)
     {
-        points[index].xyz[0] = x1;
-        points[index].xyz[1] = y1;
-        points[index].xyz[2] = z1;
-        points[index+1].xyz[0] = x2;
-        points[index+1].xyz[1] = y2;
-        points[index+1].xyz[2] = z2;
-        points[index+2].xyz[0] = x3;
-        points[index+2].xyz[1] = y3;
-        points[index+2].xyz[2] = z3;
+        points.moveTo(index, x1, y1, z1);
+        points.moveTo(index+1, x2, y2, z2);
+        points.moveTo(index+2, x3, y3, z3);
     }
     return this;
 }
@@ -316,14 +304,10 @@ ElementPtr Element::rectangle(float x1, float y1, float x2, float y2, int index)
     index *= 4;
     if(points.size() > index + 3)
     {
-        points[index].xyz[0] = x1;
-        points[index].xyz[1] = y1;
-        points[index+1].xyz[0] = x1;
-        points[index+1].xyz[1] = y2;
-        points[index+2].xyz[0] = x2;
-        points[index+2].xyz[1] = y2;
-        points[index+3].xyz[0] = x2;
-        points[index+3].xyz[1] = y1;
+        points.moveTo(index, x1, y1, points.Z(index));
+        points.moveTo(index+1, x1, y2, points.Z(index+1));
+        points.moveTo(index+2, x2, y2, points.Z(index+2));
+        points.moveTo(index+3, x2, y1, points.Z(index+3));
     }
     return this;
 }
@@ -333,18 +317,10 @@ ElementPtr Element::rectangle(float x1, float y1, float z1, float x2, float y2, 
     index *= 4;
     if(points.size() > index + 3)
     {
-        points[index].xyz[0] = x1;
-        points[index].xyz[1] = y1;
-        points[index].xyz[2] = z1;
-        points[index+1].xyz[0] = x1;
-        points[index+1].xyz[1] = y2;
-        points[index+1].xyz[2] = (z1+z2)/2.0f;
-        points[index+2].xyz[0] = x2;
-        points[index+2].xyz[1] = y2;
-        points[index+2].xyz[2] = z2;
-        points[index+3].xyz[0] = x2;
-        points[index+3].xyz[1] = y1;
-        points[index+3].xyz[2] = (z1+z2)/2.0f;
+        points.moveTo(index, x1, y1, z1);
+        points.moveTo(index+1, x1, y2, (z1+z2)/2.0f);
+        points.moveTo(index+2, x2, y2, z2);
+        points.moveTo(index+3, x2, y1, (z1+z2)/2.0f);
     }
     return this;
 }
@@ -354,8 +330,7 @@ ElementPtr Element::circle(float x, float y, float r)
     float step = 2 * M_PI / (points.size() - 1);
     for(int i = 0; i < points.size(); i++)
     {
-        points[i].xyz[0] = r * cos(step * i);
-        points[i].xyz[1] = r * sin(step * i);
+        points.moveTo(i, x + r * cos(step * i), y + r * sin(step * i), points.Z(i));
     }
     return this;
 }
@@ -365,9 +340,7 @@ ElementPtr Element::circle(float x, float y, float z, float r)
     float step = 2 * M_PI / (points.size() - 1);
     for(int i = 0; i < points.size(); i++)
     {
-        points[i].xyz[0] = r * cos(step * i);
-        points[i].xyz[1] = r * sin(step * i);
-        points[i].xyz[2] = z;
+        points.moveTo(i, x + r * cos(step * i), y + r * sin(step * i), z);
     }
     return this;
 }
@@ -426,7 +399,7 @@ ElementPtr Element::glow()
     float step = 360.0f / points.size();
     for(int i = 0; i < points.size(); i++)
     {
-        hsvTorgb(step*i, 1.0f, 1.0f, points[i].color);
+        hsvTorgb(step*i, 1.0f, 1.0f, points.getColor(i).data);
     }
     return this;
 }
@@ -592,13 +565,22 @@ void Element::draw()
     {
         if(withBegin)
         {
-            glBegin(t);
-            for(int i = 0; i < n; i++)
-            {
-                glColor4fv(points[i].color);
-                glVertex3f(points[i].xyz[0], points[i].xyz[1], points[i].xyz[2]);
-            }
-            glEnd();
+            glEnableClientState(GL_VERTEX_ARRAY);
+            glEnableClientState(GL_COLOR_ARRAY);
+            
+            glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);
+            glBufferData(GL_ARRAY_BUFFER, n * sizeof(PointLocation), points.rawXYZ(), GL_STREAM_DRAW);
+            glVertexPointer(3, GL_FLOAT, 0, 0);
+
+            glBindBuffer(GL_ARRAY_BUFFER, vboIds[1]);
+            glBufferData(GL_ARRAY_BUFFER, n * sizeof(PointColor), points.rawColor(), GL_STREAM_DRAW);
+            glColorPointer(4, GL_FLOAT, 0, 0);
+        
+            glDrawArrays(t, 0, n);
+
+            glDisableClientState(GL_VERTEX_ARRAY);
+            glDisableClientState(GL_COLOR_ARRAY); 
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         else
         {

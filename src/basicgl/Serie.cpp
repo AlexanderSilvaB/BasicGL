@@ -25,10 +25,9 @@ Serie::~Serie()
 
 SeriePtr Serie::add(float x, float y, float z)
 {
-    Point pt;
-    pt.moveTo(x, y, z);
-    pt.rgb(color[0], color[1], color[2], color[3]);
-    points.push_back(pt);
+    int pt = points.add();
+    points.moveTo(pt, x, y, z);
+    points.rgb(pt, color[0], color[1], color[2], color[3]);
     if(points.size() == 1)
     {
         minX = maxX = x;
@@ -55,8 +54,8 @@ SeriePtr Serie::update(vector<float> &x, vector<float> &y)
     reshape(sz);
     for(int i = 0; i < sz; i++)
     {
-        points[i].moveTo(x[i], y[i], 0);
-        points[i].rgb(color[0], color[1], color[2], color[3]);
+        points.moveTo(i, x[i], y[i], 0);
+        points.rgb(i, color[0], color[1], color[2], color[3]);
         if(i == 0)
         {
             minX = maxX = x[i];
@@ -84,8 +83,8 @@ SeriePtr Serie::update(vector<float> &x, vector<float> &y, vector<float> &z)
     reshape(sz);
     for(int i = 0; i < sz; i++)
     {
-        points[i].moveTo(x[i], y[i], z[i]);
-        points[i].rgb(color[0], color[1], color[2], color[3]);
+        points.moveTo(i, x[i], y[i], z[i]);
+        points.rgb(i, color[0], color[1], color[2], color[3]);
         if(i == 0)
         {
             minX = maxX = x[i];

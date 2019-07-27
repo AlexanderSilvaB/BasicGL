@@ -24,6 +24,8 @@ namespace BasicGL
 
     class Element
     {
+        private:
+            unsigned int vboIds[2];
         protected:
             Elements element;
             void init();
@@ -41,7 +43,7 @@ namespace BasicGL
             Fonts font;
             int alignment;
             ElementPtr assoc;
-            std::vector< Point > points;
+            PointList points;
             std::vector< ElementPtr > elements;
             void *data;
         
@@ -84,6 +86,7 @@ namespace BasicGL
             ElementPtr circle(float x, float y, float z, float r);
             ElementPtr glow();
 
+            void invalidate();
             void draw();
     };
 }
