@@ -392,6 +392,8 @@ void Manager::Render()
     glClearColor(window.bg[0], window.bg[1], window.bg[2], window.bg[3]);
     glClear(mode);
 
+    glEnable(GL_TEXTURE_2D);
+
     if(window.mode == MODE_3D)
     {
         gluLookAt(  window.camera.position[0],                                  window.camera.position[1],                                  window.camera.position[2],

@@ -3,10 +3,11 @@
 using namespace BasicGL;
 using namespace std;
 
-void Point::init(PointLocation *xyz, PointColor* color)
+void Point::init(PointLocation *xyz, PointColor* color, PointTexCoord *coord)
 {
     color->data[0] = color->data[1] = color->data[2] = color->data[3] = 1.0f;
     xyz->data[0] = xyz->data[1] = xyz->data[2] = 0.0f;
+    coord->data[0] = coord->data[1] = coord->data[2] = 0.0f;
 }
 
 void Point::translate(PointLocation *xyz, float x, float y, float z)
@@ -39,11 +40,19 @@ void Point::rgb(PointColor* color, float r, float g, float b, float a)
     color->data[3] = a;
 }
 
+void Point::map(PointTexCoord *coord, float x, float y, float z)
+{
+    coord->data[0] = x;
+    coord->data[1] = y;
+    coord->data[2] = z;
+}
+
 // Points list
 PointList::PointList()
 {
     xyz.clear();
     color.clear();
+    coord.clear();
 }
 
 PointList::~PointList()
@@ -55,9 +64,11 @@ int PointList::add()
 {
     PointLocation loc;
     PointColor col;
-    Point::init(&loc, &col);
+    PointTexCoord cor;
+    Point::init(&loc, &col, &cor);
     xyz.push_back(loc);
     color.push_back(col);
+    coord.push_back(cor);
     return xyz.size() - 1;
 }
 
@@ -67,6 +78,7 @@ void PointList::rm(int index)
     {
         xyz.erase(xyz.begin() + index);
         color.erase(color.begin() + index);
+        coord.erase(coord.begin() + index);
     }
 }
 
@@ -80,6 +92,11 @@ PointColor& PointList::getColor(int index)
     return color[index];
 }
 
+PointTexCoord& PointList::getCoord(int index)
+{
+    return coord[index];
+}
+
 int PointList::size()
 {
     return xyz.size();
@@ -89,6 +106,7 @@ void PointList::resize(int size)
 {
     xyz.resize(size);
     color.resize(size);
+    coord.resize(size);
 }
 
 PointLocation* PointList::rawXYZ()
@@ -99,6 +117,11 @@ PointLocation* PointList::rawXYZ()
 PointColor* PointList::rawColor()
 {
     return color.data();
+}
+
+PointTexCoord* PointList::rawCoords()
+{
+    return coord.data();
 }
 
 float PointList::X(int index)
@@ -136,6 +159,21 @@ float PointList::A(int index)
     return color[index].data[3];
 }
 
+float PointList::CX(int index)
+{
+    return coord[index].data[0];
+}
+
+float PointList::CY(int index)
+{
+    return coord[index].data[1];
+}
+
+float PointList::CZ(int index)
+{
+    return coord[index].data[2];
+}
+
 void PointList::translate(int index, float x, float y, float z)
 {
     if(xyz.size() > index)
@@ -165,5 +203,13 @@ void PointList::rgb(int index, float r, float g, float b, float a)
     if(xyz.size() > index)
     {
         Point::rgb(&color[index], r, g, b, a);
+    }
+}
+
+void PointList::map(int index, float x, float y, float z)
+{
+    if(xyz.size() > index)
+    {
+        Point::map(&coord[index], x, y, z);
     }
 }

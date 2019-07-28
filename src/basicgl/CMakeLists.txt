@@ -9,6 +9,7 @@ include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
 
 set(SRC Camera.cpp
         Point.cpp
+        Texture.cpp
         Element.cpp
         Serie.cpp
         Plot.cpp

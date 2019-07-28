@@ -3,9 +3,16 @@
 
 #include "Point.hpp"
 #include "Elements.hpp"
+#include "Texture.hpp"
 #include <float.h>
 #include <vector>
 #include <string>
+
+#define GL_GLEXT_PROTOTYPES
+
+#include <GL/freeglut.h>
+#include <GL/freeglut_ext.h>
+#include <GL/gl.h>
 
 namespace BasicGL
 {
@@ -26,10 +33,12 @@ namespace BasicGL
     {
         private:
             unsigned int vboIds[2];
+            GLUquadric *solid;
         protected:
             Elements element;
             void init();
             static void hsvTorgb(float h, float s, float v, float *rgb);
+            static float map(float v, float minIn, float maxIn, float minOut, float maxOut);
             void* getFont();
         public:
             bool visible;
@@ -39,17 +48,19 @@ namespace BasicGL
             float position[3];
             float rotation[3];
             float color[4];
+            bool applyColors;
             std::string text;
             Fonts font;
             int alignment;
             ElementPtr assoc;
+            Texture texture;
             PointList points;
             std::vector< ElementPtr > elements;
             void *data;
         
             Element(Elements element);
             virtual ~Element();
-            
+
             ElementPtr reshape(int n, bool byElement = true);
             ElementPtr create(Elements element);
 
@@ -88,6 +99,7 @@ namespace BasicGL
             ElementPtr circle(float x, float y, float z, float r);
             ElementPtr glow();
             ElementPtr glow(int index, int pos = -1);
+            ElementPtr map();
 
             void invalidate();
             void draw();

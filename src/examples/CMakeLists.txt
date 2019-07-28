@@ -27,3 +27,6 @@ target_link_libraries(text basicgl)
 
 add_executable(paint paint.cpp)
 target_link_libraries(paint basicgl)
+
+add_executable(texture texture.cpp)
+target_link_libraries(texture basicgl)

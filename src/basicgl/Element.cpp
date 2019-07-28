@@ -29,6 +29,8 @@ Element::Element(Elements element) : element(element)
     text = "";
     font = Default8x13;
     alignment = Left;
+    applyColors = true;
+    solid = NULL;
     init();
 }
 
@@ -71,26 +73,36 @@ void Element::init()
         case POINT:
             point(0, 0, 0);
             glow();
+            map();
             break;
         case LINE:
             line(-0.5f, 0, 0, 0.5f, 0, 0);
             glow();
+            map();
             break;
         case TRIANGLE:
             triangle(0, -0.5f, 0, -0.5f, 0.5f, 0, 0.5f, 0.5f, 0);
             glow();
+            map();
             break;
         case RECTANGLE:
             rectangle(-0.5f, -0.5f, 0, 0.5f, 0.5f, 0);
             glow();
+            map();
             break;
         case CIRCLE:
             circle(0, 0, 0, 0.5f);
             glow();
+            map();
             break;
         default:
             break;
     }
+
+    solid = gluNewQuadric();
+    gluQuadricDrawStyle(solid, GLU_FILL);
+    gluQuadricTexture(solid, GL_TRUE);
+    gluQuadricNormals(solid, GLU_SMOOTH);
 }
 
 ElementPtr Element::reshape(int n, bool byElement)
@@ -434,6 +446,43 @@ ElementPtr Element::glow(int index, int pos)
     return this;
 }
 
+ElementPtr Element::map()
+{
+    float minX, maxX, minY, maxY, x, y;
+    for(int i = 0; i < points.size(); i++)
+    {
+        if(i == 0)
+        {
+            minX = maxX = points.X(i);
+            minY = maxY = points.Y(i);
+        }
+        else
+        {
+            x = points.X(i);
+            y = points.Y(i);
+            if(x < minX)
+                minX = x;
+            else if(x > maxX)
+                maxX = x;
+            if(y < minY)
+                minY = y;
+            else if(y > maxY)
+                maxY = y;
+        }
+    }
+    for(int i = 0; i < points.size(); i++)
+    {
+        x = map(points.X(i), minX, maxX, 0.0f, 1.0f);
+        y = map(points.Y(i), minY, maxY, 0.0f, 1.0f);
+        points.map(i, x, y, 0);
+    }
+}
+
+float Element::map(float v, float minIn, float maxIn, float minOut, float maxOut)
+{
+    return (v - minIn) * (maxOut - minOut) / (maxIn - minIn) + minOut;
+}
+
 void* Element::getFont()
 {
     void* ret = GLUT_BITMAP_8_BY_13;
@@ -618,23 +667,32 @@ void Element::draw()
     }
     else
     {
+        texture.begin();
         if(withBegin)
         {
             glEnableClientState(GL_VERTEX_ARRAY);
-            glEnableClientState(GL_COLOR_ARRAY);
+            if(applyColors)
+                glEnableClientState(GL_COLOR_ARRAY);
             
             glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);
             glBufferData(GL_ARRAY_BUFFER, n * sizeof(PointLocation), points.rawXYZ(), GL_STREAM_DRAW);
             glVertexPointer(3, GL_FLOAT, 0, 0);
 
-            glBindBuffer(GL_ARRAY_BUFFER, vboIds[1]);
-            glBufferData(GL_ARRAY_BUFFER, n * sizeof(PointColor), points.rawColor(), GL_STREAM_DRAW);
-            glColorPointer(4, GL_FLOAT, 0, 0);
+            if(applyColors)
+            {
+                glBindBuffer(GL_ARRAY_BUFFER, vboIds[1]);
+                glBufferData(GL_ARRAY_BUFFER, n * sizeof(PointColor), points.rawColor(), GL_STREAM_DRAW);
+                glColorPointer(4, GL_FLOAT, 0, 0);
+            }
+
+            texture.draw(n, points.rawCoords());
         
             glDrawArrays(t, 0, n);
 
             glDisableClientState(GL_VERTEX_ARRAY);
-            glDisableClientState(GL_COLOR_ARRAY); 
+            if(applyColors)
+                glDisableClientState(GL_COLOR_ARRAY); 
+            
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         else
@@ -646,25 +704,35 @@ void Element::draw()
                     if(wireframe)
                         glutWireSphere(1.0f, 20, 20);
                     else
-                        glutSolidSphere(1.0f, 20, 20);
+                        gluSphere(solid, 1.0f, 20, 20);
+                        // glutSolidSphere(1.0f, 20, 20);
                     break;
                 case CONE:
                     if(wireframe)
                         glutWireCone(0.5f, 1.0f, 20, 20);
                     else
-                        glutSolidCone(0.5f, 1.0f, 20, 20);
+                        //glutSolidCone(0.5f, 1.0f, 20, 20);
+                        gluCylinder(solid, 0.5f, 0.0f, 1.0f, 20, 20);
                     break;
                 case CUBE:
                     if(wireframe)
                         glutWireCube(1.0f);
                     else
+                    {
+                        // temp
+                        glEnable(GL_TEXTURE_GEN_S);
+                        glEnable(GL_TEXTURE_GEN_T);
                         glutSolidCube(1.0f);
+                        glDisable(GL_TEXTURE_GEN_S);
+                        glDisable(GL_TEXTURE_GEN_T);
+                    }
                     break;
                 case CYLINDER:
                     if(wireframe)
                         glutWireCylinder(0.5f, 1.0f, 20, 20);
                     else
-                        glutSolidCylinder(0.5f, 1.0f, 20, 20);
+                        //glutSolidCylinder(0.5f, 1.0f, 20, 20);
+                        gluCylinder(solid, 0.5f, 0.5f, 1.0f, 20, 20);
                     break;
                 case TEAPOT:
                     if(wireframe)
@@ -676,6 +744,7 @@ void Element::draw()
                     break;
             }   
         }
+        texture.end();
     }
     glColor4fv(color);
     for(int i = 0; i < elements.size(); i++)
