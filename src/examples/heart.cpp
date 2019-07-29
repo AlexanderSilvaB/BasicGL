@@ -12,7 +12,7 @@ float ABS(float x)
     return -x;
 }
 
-void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
+void rotate(ElementsList elements, WindowPtr window, float ellapsedTime)
 {
     ElementPtr heart = elements.front();
     float scale = 0.5f + 0.5f*ABS(sin(2 * M_PI * window->timeSinceBegin));
@@ -31,12 +31,13 @@ int main(int argc, char *argv[])
     heart->reshape(360);
     heart->glow();
     
+    float size = 0.03f;
     for(int i = 0; i < 360; i++)
     {
         float t = (i / 360.0f) * 2 * M_PI;
-        float x = 0.03f * (16*sin(t)*sin(t)*sin(t));
-        float y = -0.03f * (13*cos(t) - 5*cos(2*t) - 2*cos(3*t) - cos(4*t));
-        heart->point(x, -y, 0, i);
+        float x = size * (16*sin(t)*sin(t)*sin(t));
+        float y = size * (13*cos(t) - 5*cos(2*t) - 2*cos(3*t) - cos(4*t));
+        heart->point(x, y, 0, i);
     }
     
     Manager::Show();

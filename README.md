@@ -38,6 +38,7 @@ This is a simple framework which allows to create simple OpenGL apps without muc
 - [ ] Screen video capture
 - [ ] Lighting
 - [ ] Android and iOS support
+- [ ] Better plot features
 
 ## Example code
 This simple code creates a rotating teapot
