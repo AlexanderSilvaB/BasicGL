@@ -40,7 +40,7 @@ void keyboardHandler(Keyboard keyboard, WindowPtr window)
 
 int main(int argc, char *argv[])
 {
-    string objFile = "../src/examples/data/earth_ball.obj";
+    string objFile = "../src/examples/data/mario.obj";
     if(argc > 1)
         objFile = string(argv[1]);
 

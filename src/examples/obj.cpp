@@ -7,8 +7,8 @@ using namespace std;
 
 void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
 {
-    ElementPtr mario = window->find("mario");
-    mario->rotate( 0, ellasedTime );
+    ElementPtr earth = window->find("earth");
+    earth->rotate( 0, 0.5f * ellasedTime );
 }
 
 int main(int argc, char *argv[])
@@ -17,10 +17,10 @@ int main(int argc, char *argv[])
     Manager::CreateWindow("Obj", MODE_3D);
     Manager::SetAnimationFunction(rotate);
 
-    ElementPtr mario = Manager::CreateElement(OBJECT, "mario");
-    mario->obj.load("../src/examples/data/mario.obj");
-    mario->scaleTo(3.0f);
-
+    ElementPtr earth = Manager::CreateElement(OBJECT, "earth");
+    earth->obj.load("../src/examples/data/earth_ball.obj");
+    earth->obj.flipYZ = false;
+    earth->scaleTo(3.0f);
 
     Manager::Show();
     return 0;
