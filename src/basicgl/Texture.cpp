@@ -9,6 +9,9 @@
 #include <GL/freeglut_ext.h>
 #include <GL/gl.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 using namespace BasicGL;
 using namespace std;
 
@@ -32,41 +35,14 @@ bool Texture::available()
 
 bool Texture::load(const std::string& fileName)
 {
-    FILE* f = fopen(fileName.c_str(), "rb");
-    if(f == NULL)
-        return false;
-    
-    unsigned char info[54];
-    fread(info, sizeof(unsigned char), 54, f);
-
-    unsigned int width = *(int*)&info[18];
-    unsigned int height = *(int*)&info[22];
-
-    // cout << endl;
-    // cout << "  Name: " << fileName << endl;
-    // cout << " Width: " << width << endl;
-    // cout << "Height: " << height << endl;
-
-    int size = 3 * width * height;
-    unsigned char* data = new unsigned char[size]; // allocate 3 bytes per pixel
-    fread(data, sizeof(unsigned char), size, f); // read the rest of the data at once
-    fclose(f);
-
-    unsigned char tmp;
-    for(int i = 0; i < size; i+= 3)
-    {
-        tmp = data[i];
-        data[i] = data[i+2];
-        data[i+2] = tmp;
-    }
-
-    fill(width, height, data);
-    delete[] data;
-
+    int width, height, bpp;
+    uint8_t* data = stbi_load(fileName.c_str(), &width, &height, &bpp, STBI_default);
+    fill(width, height, bpp, data);
+    stbi_image_free(data);
     return true;
 }
 
-void Texture::fill(const unsigned int width, const unsigned int height, const unsigned char *data)
+void Texture::fill(const unsigned int width, const unsigned int height, const unsigned int bpp, const unsigned char *data)
 {
     free();
 
@@ -80,7 +56,26 @@ void Texture::fill(const unsigned int width, const unsigned int height, const un
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_REPEAT );
-    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, width, height, GL_RGB, GL_UNSIGNED_BYTE, data );
+
+    if (bpp == 1) 
+    {
+        gluBuild2DMipmaps( GL_TEXTURE_2D, 1, width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data );
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    }
+    else if (bpp == 3) 
+    {
+        gluBuild2DMipmaps( GL_TEXTURE_2D, 3, width, height, GL_RGB, GL_UNSIGNED_BYTE, data );
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    } 
+    else if (bpp == 4) 
+    {
+        gluBuild2DMipmaps( GL_TEXTURE_2D, 4, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data );
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    } 
+    else 
+    {
+        assert(0);  // TODO
+    }
 
     this->width = width;
     this->height = height;

@@ -20,6 +20,8 @@ Window::Window()
     windowedY = 50;
     windowedWidth = 320;
     windowedHeight = 240;
+    lastMouseX = lastMouseY = 0;
+    saveFileName = "";
 }
 
 Window::~Window()

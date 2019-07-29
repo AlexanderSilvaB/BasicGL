@@ -30,3 +30,6 @@ target_link_libraries(paint basicgl)
 
 add_executable(texture texture.cpp)
 target_link_libraries(texture basicgl)
+
+add_executable(obj obj.cpp)
+target_link_libraries(obj basicgl)

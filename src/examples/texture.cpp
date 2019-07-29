@@ -12,8 +12,10 @@ int main(int argc, char *argv[])
     Manager::SetBackground(13, 40, 53);
 
     ElementPtr rect = Manager::CreateElement(CIRCLE);
-    rect->texture.load("../src/examples/mario.bmp");
+    rect->texture.load("../src/examples/data/mario.bmp");
     rect->applyColors = false;
+
+    Manager::Save("texture.png");
 
     Manager::Show();
     return 0;

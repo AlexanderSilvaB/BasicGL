@@ -6,6 +6,9 @@
 #include <cmath>
 #include <unistd.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb/stb_image_write.h>
+
 using namespace BasicGL;
 using namespace std;
 
@@ -275,10 +278,20 @@ void Manager::MouseButtons(int button, int state, int x, int y)
     mouse.left = button == GLUT_LEFT_BUTTON;
     mouse.middle = button == GLUT_MIDDLE_BUTTON;
     mouse.right = button == GLUT_RIGHT_BUTTON;
+    if(button == 3)
+        mouse.scroll = 1.0f;
+    else if(button == 4)
+        mouse.scroll = -1.0f;
+    else
+        mouse.scroll = 0.0f;
     mouse.windowX = x;
     mouse.windowY = y;
     mouse.x = ((x / window.width) - 0.5f) * 2.0f;
     mouse.y = ((y / window.height) - 0.5f) * 2.0f;
+    mouse.dx = 0;
+    mouse.dy = 0;
+    window.lastMouseX = x;
+    window.lastMouseY = y;
     if(window.cartesian)
         mouse.y *= -1;
     mouse.pressed = state == GLUT_DOWN;
@@ -298,16 +311,30 @@ void Manager::MouseMotion(int x, int y)
     
     Window& window = windows[index];
 
+    if(window.lastMouseX < 0)
+    {
+        window.lastMouseX = x;
+        window.lastMouseY = y;
+    }
+
     struct Mouse_st mouse;
     mouse.left = false;
     mouse.middle = false;
     mouse.right = false;
+    mouse.scroll = 0.0f;
     mouse.windowX = x;
     mouse.windowY = y;
     mouse.x = ((x / window.width) - 0.5f) * 2.0f;
     mouse.y = ((y / window.height) - 0.5f) * 2.0f;
+    mouse.dx = ((x - window.lastMouseX)/ window.width) * 2.0f;
+    mouse.dy = -((y - window.lastMouseY)/ window.height) * 2.0f;
+    window.lastMouseX = x;
+    window.lastMouseY = y;
     if(window.cartesian)
+    {
         mouse.y *= -1;
+        mouse.dy *= -1;
+    }
     mouse.pressed = false;
     mouse.released = false;
     mouse.move = true;
@@ -329,10 +356,15 @@ void Manager::MouseEntry(int state)
     mouse.left = false;
     mouse.middle = false;
     mouse.right = false;
+    mouse.scroll = 0.0f;
     mouse.windowX = 0;
     mouse.windowY = 0;
     mouse.x = 0;
     mouse.y = 0;
+    mouse.dx = 0;
+    mouse.dy = 0;
+    window.lastMouseX = -1;
+    window.lastMouseY = -1;
     mouse.pressed = false;
     mouse.released = false;
     mouse.move = false;
@@ -408,4 +440,20 @@ void Manager::Render()
         glPopMatrix();
     }
     glutSwapBuffers();
+
+    if(!window.saveFileName.empty())
+    {
+        int sz = window.width * window.height * 3;
+        uint8_t* data = new uint8_t[sz];
+        glReadPixels(0, 0, window.width, window.height, GL_RGB, GL_UNSIGNED_BYTE, data);
+        stbi_flip_vertically_on_write(1);
+        stbi_write_png(window.saveFileName.c_str(), window.width, window.height, 3, data, window.width*3);
+        delete[] data;
+        window.saveFileName = "";
+    }
+}
+
+void Manager::Save(const std::string& fileName)
+{
+    windows[currentWindow].saveFileName = fileName;
 }

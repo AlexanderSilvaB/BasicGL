@@ -19,7 +19,7 @@ namespace BasicGL
 
             bool available();
             bool load(const std::string& fileName);
-            void fill(const unsigned int width, const unsigned int height, const unsigned char *data);
+            void fill(const unsigned int width, const unsigned int height, const unsigned int bpp, const unsigned char *data);
 
             void begin();
             void draw(int n, PointTexCoord *coords);

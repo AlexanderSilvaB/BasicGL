@@ -95,14 +95,18 @@ void Element::init()
             glow();
             map();
             break;
+        case SPHERE:
+        case CUBE:
+        case CYLINDER:
+        case CONE:
+            solid = gluNewQuadric();
+            gluQuadricDrawStyle(solid, GLU_FILL);
+            gluQuadricTexture(solid, GL_TRUE);
+            gluQuadricNormals(solid, GLU_SMOOTH);
+            break;
         default:
             break;
     }
-
-    solid = gluNewQuadric();
-    gluQuadricDrawStyle(solid, GLU_FILL);
-    gluQuadricTexture(solid, GL_TRUE);
-    gluQuadricNormals(solid, GLU_SMOOTH);
 }
 
 ElementPtr Element::reshape(int n, bool byElement)
@@ -202,9 +206,9 @@ ElementPtr Element::scale(float x, float y, float z)
 {
     if(y == FLT_MIN) y = x;
     if(z == FLT_MIN) z = y;
-    scales[0] *= x;
-    scales[1] *= y;
-    scales[2] *= z;
+    scales[0] += x;
+    scales[1] += y;
+    scales[2] += z;
     return this;
 }
 
@@ -473,7 +477,7 @@ ElementPtr Element::map()
     for(int i = 0; i < points.size(); i++)
     {
         x = map(points.X(i), minX, maxX, 0.0f, 1.0f);
-        y = map(points.Y(i), minY, maxY, 0.0f, 1.0f);
+        y = map(points.Y(i), minY, maxY, 1.0f, 0.0f);
         points.map(i, x, y, 0);
     }
 }
@@ -664,6 +668,10 @@ void Element::draw()
         {
             glutBitmapCharacter(font, text[i]);
         }
+    }
+    else if(element == OBJECT)
+    {
+        obj.draw(wireframe);
     }
     else
     {

@@ -4,6 +4,7 @@
 #include "Point.hpp"
 #include "Elements.hpp"
 #include "Texture.hpp"
+#include "OBJ.hpp"
 #include <float.h>
 #include <vector>
 #include <string>
@@ -54,6 +55,8 @@ namespace BasicGL
             int alignment;
             ElementPtr assoc;
             Texture texture;
+            OBJ obj;
+
             PointList points;
             std::vector< ElementPtr > elements;
             void *data;

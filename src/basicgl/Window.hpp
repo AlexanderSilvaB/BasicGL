@@ -6,6 +6,7 @@
 #include "Keyboard.hpp"
 #include "Mouse.hpp"
 #include <vector>
+#include <string>
 #include <time.h>
 
 namespace BasicGL
@@ -35,6 +36,8 @@ namespace BasicGL
             struct timespec lastTime;
             bool cartesian;
             float width, height;
+            float lastMouseX, lastMouseY;
+            std::string saveFileName;
         
             std::vector< Element* > elements;
             AnimationFunction animationFunction;

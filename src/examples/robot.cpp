@@ -14,9 +14,9 @@ int main(int argc, char *argv[])
     Manager::SetBackground(13, 40, 53);
 
     ElementPtr robot = Manager::CreateElement(CONTAINER);
-    robot->create(TRIANGLE)->rotateTo(0, 0, M_PI/2)->scale(0.5)->translate(0.6, 0, 0);
+    robot->create(TRIANGLE)->rotateTo(0, 0, M_PI/2)->scaleTo(0.5)->translate(0.6, 0, 0);
     robot->create(CIRCLE);
-    robot->scale(0.2f)->rgb(0, 0, 1.0f);
+    robot->scaleTo(0.2f)->rgb(0, 0, 1.0f);
 
     float x = 0, y = 0, th = 0;
     float vl = 0.1;

@@ -7,9 +7,12 @@ find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
 
+include_directories(external)
+
 set(SRC Camera.cpp
         Point.cpp
         Texture.cpp
+        OBJ.cpp
         Element.cpp
         Serie.cpp
         Plot.cpp
@@ -42,5 +45,5 @@ install(EXPORT ${PROJECT_NAME}_Targets
 install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.h*")
+install(DIRECTORY ${PROJECT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.h*" PATTERN "basicgl/external" EXCLUDE)
 install (TARGETS ${PROJECT_NAME} DESTINATION lib)
