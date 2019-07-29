@@ -86,7 +86,7 @@ namespace BasicGL
             virtual ElementPtr rgb(unsigned char r, unsigned char g = 0, unsigned char b = 0, unsigned char a = 255);
             virtual ElementPtr rgb(float r, float g = 0.0f, float b = 0.0f, float a = 1.0f);
             virtual ElementPtr setWireframe(bool wireframe);
-            virtual ElementPtr setText(const std::string& text, Fonts font = Fonts::Default8x13);
+            virtual ElementPtr setText(const std::string& text, Fonts font = Default8x13);
 
             float getTextWidth();
             float getTextHeight();
