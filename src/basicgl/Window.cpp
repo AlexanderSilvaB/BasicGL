@@ -29,6 +29,21 @@ Window::~Window()
 
 }
 
+void Window::assocElement(ElementPtr element)
+{
+    assocElements.push_back(element);
+}
+
+void Window::Destroy()
+{
+    for(int i = 0; i < assocElements.size(); i++)
+    {
+        ElementPtr el = assocElements[i];
+        delete el;
+    }
+    assocElements.clear();
+}
+
 bool Window::IsFullscreen()
 {
     return fullscren;

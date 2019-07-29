@@ -13,7 +13,7 @@ namespace BasicGL
 {
     class Window;
 
-    typedef const std::vector< Element* >& ElementsList;
+    typedef const std::vector< ElementPtr >& ElementsList;
     typedef Window* WindowPtr;
 
     typedef void (*AnimationFunction)(ElementsList elements, WindowPtr window, float ellapsedTime);
@@ -24,6 +24,7 @@ namespace BasicGL
     {
         private:
             int windowedX, windowedY, windowedWidth, windowedHeight;
+            std::vector< ElementPtr > assocElements;
         public:
             int id;
             int index;
@@ -39,13 +40,16 @@ namespace BasicGL
             float lastMouseX, lastMouseY;
             std::string saveFileName;
         
-            std::vector< Element* > elements;
+            std::vector< ElementPtr > elements;
             AnimationFunction animationFunction;
             KeyboardFunction keyboardFunction;
             MouseFunction mouseFunction;
 
             Window();
             virtual ~Window();
+
+            void assocElement(ElementPtr element);
+            void Destroy();
 
             bool IsFullscreen();
             void SetFullscreen(bool enabled);

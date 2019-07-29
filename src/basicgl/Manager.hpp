@@ -14,6 +14,8 @@ namespace BasicGL
 
     class Manager
     {
+        private:
+            static bool initialized;
         public:
             static void Init(int argc, char *argv[]);
             static void Destroy();

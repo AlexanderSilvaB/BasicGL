@@ -36,7 +36,7 @@ OBJ::OBJ()
 
 OBJ::~OBJ()
 {
-
+    free();
 }
 
 bool OBJ::available()

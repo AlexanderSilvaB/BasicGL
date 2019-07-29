@@ -36,7 +36,26 @@ Element::Element(Elements element, const string name) : name(name), element(elem
 
 Element::~Element()
 {
-
+    switch(element)
+    {
+        case POINT:
+        case LINE:
+        case TRIANGLE:
+        case RECTANGLE:
+        case POLYGON:
+        case SEQUENCE:
+        case LOOP:
+        case CONNECTED_TRIANGLES:
+        case RADIAL_TRIANGLES:
+        case CONNECTED_RECTANGLES:
+        case CIRCLE:
+            glDeleteBuffers(2, vboIds);
+            break;
+        default:
+            break;
+    }
+    if(solid != NULL)
+        gluDeleteQuadric(solid);
 }
 
 void Element::init()
@@ -159,6 +178,7 @@ ElementPtr Element::create(Elements element)
 {
     ElementPtr el = new Element(element);
     elements.push_back(el);
+    Manager::CurrentWindow()->assocElement(el);
     return el;
 }
 

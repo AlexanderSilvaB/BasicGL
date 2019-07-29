@@ -14,6 +14,7 @@ using namespace std;
 
 vector< Window > Manager::windows;
 int Manager::currentWindow = -1;
+bool Manager::initialized = false;
 
 void Manager::now(struct timespec &t)
 {
@@ -22,12 +23,19 @@ void Manager::now(struct timespec &t)
 
 void Manager::Init(int argc, char *argv[])
 {
-    glutInit(&argc, argv);  
+    if(!initialized)
+    {
+        atexit (Destroy);
+        glutInit(&argc, argv);
+        initialized = true;
+    }
 }
 
 void Manager::Destroy()
 {
-    
+    for(int i = 0; i < windows.size(); i++)
+        windows[i].Destroy();
+    windows.clear();
 }
 
 int Manager::CreateWindow(const char *name, Modes mode, int width, int height, int x, int y)
@@ -110,6 +118,7 @@ Element* Manager::CreateElement(Elements element, const string name)
 {
     Element* el = new Element(element, name);
     windows[currentWindow].elements.push_back(el);
+    windows[currentWindow].assocElement(el);
     return el;
 }
 
@@ -117,6 +126,7 @@ Plot* Manager::CreatePlot(int rows, int cols, int index, const string name)
 {
     Plot* plt = new Plot(rows, cols, index, name);
     windows[currentWindow].elements.push_back(plt);
+    windows[currentWindow].assocElement(plt);
     return plt;
 }
 

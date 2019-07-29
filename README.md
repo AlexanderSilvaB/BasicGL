@@ -89,6 +89,11 @@ int main(int argc, char *argv[])
     Manager::Show();
     
     // Destroys all BasicGL resources
+    /* 
+        In the current version this function is not called after 
+        Manager::Show, but we call it here to keep compatible with 
+        future implementations when we don't rely on glutMainLoop
+    */
     Manager::Destroy();
 
     return 0;
