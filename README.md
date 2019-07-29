@@ -20,7 +20,7 @@ Uses the container element to pack shapes together: [snowman.cpp](src/examples/s
 
 ![Snowman example](docs/images/snowman.PNG?raw=true "Snowman")
 
-Uses the container element to pack shapes together: [snowman.cpp](src/examples/snowman.cpp)
+Allows drawing using the mouse and keyboard features: [paint.cpp](src/examples/paint.cpp)
 
 ![Paint example](docs/images/paint.PNG?raw=true "Paint")
 
