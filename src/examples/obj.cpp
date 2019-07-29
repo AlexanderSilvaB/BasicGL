@@ -23,5 +23,7 @@ int main(int argc, char *argv[])
     earth->scaleTo(3.0f);
 
     Manager::Show();
+    Manager::Destroy();
+    
     return 0;
 }

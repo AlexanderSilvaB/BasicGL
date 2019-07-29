@@ -15,5 +15,7 @@ int main(int argc, char *argv[])
     Manager::CreateElement(TRIANGLE);
 
     Manager::Show();
+    Manager::Destroy();
+    
     return 0;
 }

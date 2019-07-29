@@ -100,6 +100,10 @@ int main(int argc, char *argv[])
 
     // Shows the window
     Manager::Show();
+    
+    // Destroys all BasicGL resources
+    Manager::Destroy();
+
     return 0;
 }
 ```

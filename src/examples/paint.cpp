@@ -50,5 +50,7 @@ int main(int argc, char *argv[])
     Manager::CreateElement(TEXT)->moveTo(0, -0.9)->textAlign(CenterX | CenterY)->setText("Press any key to change style");
 
     Manager::Show();
+    Manager::Destroy();
+    
     return 0;
 }

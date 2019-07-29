@@ -25,6 +25,11 @@ void Manager::Init(int argc, char *argv[])
     glutInit(&argc, argv);  
 }
 
+void Manager::Destroy()
+{
+    
+}
+
 int Manager::CreateWindow(const char *name, Modes mode, int width, int height, int x, int y)
 {
     unsigned int _mode = GLUT_DOUBLE | GLUT_RGB;

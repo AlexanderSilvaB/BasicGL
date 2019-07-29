@@ -16,5 +16,7 @@ int main(int argc, char *argv[])
     text->textAlign(CenterX | CenterY);
 
     Manager::Show();
+    Manager::Destroy();
+    
     return 0;
 }

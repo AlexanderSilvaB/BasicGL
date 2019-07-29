@@ -6,7 +6,7 @@ using namespace BasicGL;
 void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
 {
     ElementPtr teapot = window->get(0);
-    teapot->rotate( 0, 2 * M_PI * ellasedTime );
+    teapot->rotate( 0, 2 * M_PI * ellasedTime, 0 );
 }
 
 void keyboard(Keyboard keyboard, WindowPtr window)
@@ -32,5 +32,7 @@ int main(int argc, char *argv[])
     Manager::CreateElement(TEAPOT, "teapot");
 
     Manager::Show();
+    Manager::Destroy();
+
     return 0;
 }

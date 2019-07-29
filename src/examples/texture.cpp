@@ -18,5 +18,7 @@ int main(int argc, char *argv[])
     Manager::Save("texture.png");
 
     Manager::Show();
+    Manager::Destroy();
+    
     return 0;
 }

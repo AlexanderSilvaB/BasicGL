@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
         t += dt;
     }
     Manager::Show();
+    Manager::Destroy();
         
     return 0;
 }

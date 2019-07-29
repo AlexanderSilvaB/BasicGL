@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
         Manager::Pause();
     }
     Manager::Show();
-        
+    Manager::Destroy();
+    
     return 0;
 }

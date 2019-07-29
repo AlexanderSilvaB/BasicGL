@@ -24,5 +24,7 @@ int main(int argc, char *argv[])
     snowman->create(CONE)->scaleTo(0.1f, 0.1f, 0.2f)->translate( 0.0f, 0.4f, 0.3f)->rgb((unsigned char)204, 78, 0);
 
     Manager::Show();
+    Manager::Destroy();
+    
     return 0;
 }

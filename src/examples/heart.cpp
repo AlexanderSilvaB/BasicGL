@@ -40,5 +40,7 @@ int main(int argc, char *argv[])
     }
     
     Manager::Show();
+    Manager::Destroy();
+    
     return 0;
 }
