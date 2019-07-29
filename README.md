@@ -54,7 +54,7 @@ A simple OBJ viewer with zoom, translation and rotation capabilities: [viewer.cp
 - [ ] Lighting
 
 ## Example code
-This simple code creates rotating teapot
+This simple code creates a rotating teapot
 ```cpp
 // Includes the BasicGL library and the C++ standard math library (for M_PI)
 #include <basicgl/Manager.hpp>
