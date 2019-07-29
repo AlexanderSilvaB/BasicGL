@@ -37,6 +37,8 @@ namespace BasicGL
             static std::string GetBaseDir(const std::string& filepath);
             static bool FileExists(const std::string& abs_filename);
         public:
+            bool flipYZ;
+
             OBJ();
             virtual ~OBJ();
 
@@ -44,7 +46,7 @@ namespace BasicGL
             bool load(const std::string& fileName);
             void free();
 
-            void draw(bool wireframe);
+            void draw(bool solid, bool wireframe);
     };
 }
 

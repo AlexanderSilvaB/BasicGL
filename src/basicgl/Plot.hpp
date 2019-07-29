@@ -21,7 +21,7 @@ namespace BasicGL
             float axisMinX, axisMaxX, axisMinY, axisMaxY;
             bool fixedAxis;
 
-            Plot(int rows = 1, int cols = 1, int index = 1);
+            Plot(int rows = 1, int cols = 1, int index = 1, const std::string name = "");
             virtual ~Plot();
 
             SeriePtr createSerie(const std::string opts = "k");

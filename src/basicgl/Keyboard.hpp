@@ -15,6 +15,7 @@ namespace BasicGL
     #define  KEY_F10                       0x000A
     #define  KEY_F11                       0x000B
     #define  KEY_F12                       0x000C
+    #define  KEY_ESC                       0x001B
     #define  KEY_LEFT                      0x0064
     #define  KEY_UP                        0x0065
     #define  KEY_RIGHT                     0x0066

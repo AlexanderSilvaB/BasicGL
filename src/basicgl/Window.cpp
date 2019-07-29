@@ -59,3 +59,27 @@ void Window::ToggleFullscreen()
 {
     SetFullscreen(!fullscren);
 }
+
+float Window::ZPlane()
+{
+    return camera.position[2] * 0.5f;
+}
+
+ElementPtr Window::find(const string& name)
+{
+    ElementPtr ret = NULL;
+    for(int i = 0; i < elements.size(); i++)
+    {
+        ret = elements[i]->find(name);
+        if(ret != NULL)
+            break;
+    }
+    return ret;
+}
+
+ElementPtr Window::get(int index)
+{
+    if(elements.size() > index)
+        return elements[index];
+    return NULL;
+}

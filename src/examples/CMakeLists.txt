@@ -33,3 +33,6 @@ target_link_libraries(texture basicgl)
 
 add_executable(obj obj.cpp)
 target_link_libraries(obj basicgl)
+
+add_executable(viewer viewer.cpp)
+target_link_libraries(viewer basicgl)

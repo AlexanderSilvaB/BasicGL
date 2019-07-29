@@ -42,6 +42,7 @@ namespace BasicGL
             static float map(float v, float minIn, float maxIn, float minOut, float maxOut);
             void* getFont();
         public:
+            std::string name;
             bool visible;
             float stroke;
             bool wireframe;
@@ -61,8 +62,11 @@ namespace BasicGL
             std::vector< ElementPtr > elements;
             void *data;
         
-            Element(Elements element);
+            Element(Elements element, const std::string name = "");
             virtual ~Element();
+
+            ElementPtr find(const std::string& name);
+            ElementPtr get(int index);
 
             ElementPtr reshape(int n, bool byElement = true);
             ElementPtr create(Elements element);
@@ -105,7 +109,7 @@ namespace BasicGL
             ElementPtr map();
 
             void invalidate();
-            void draw();
+            void draw(bool cartesian);
     };
 }
 

@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
     Manager::CreateWindow("Paint", MODE_2D);
-    Manager::SetBackground(13, 40, 53);
     Manager::SetMouseFunction(mouseHandler);
     Manager::SetKeyboardFunction(keyboardHandler);
 

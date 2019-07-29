@@ -5,7 +5,7 @@ using namespace BasicGL;
 
 void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
 {
-    ElementPtr teapot = elements[0];
+    ElementPtr teapot = window->get(0);
     teapot->rotate( 0, 2 * M_PI * ellasedTime );
 }
 
@@ -17,7 +17,7 @@ void keyboard(Keyboard keyboard, WindowPtr window)
     }
     else if(keyboard.key == KEY_LEFT || keyboard.key == KEY_RIGHT)
     {
-        window->elements[0]->glow();
+        window->get(0)->glow();
     }
 }
 
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	Manager::SetAnimationFunction(rotate);
     Manager::SetKeyboardFunction(keyboard);
 
-    Manager::CreateElement(TEAPOT);
+    Manager::CreateElement(TEAPOT, "teapot");
 
     Manager::Show();
     return 0;

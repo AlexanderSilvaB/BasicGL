@@ -50,6 +50,10 @@ namespace BasicGL
             bool IsFullscreen();
             void SetFullscreen(bool enabled);
             void ToggleFullscreen();
+
+            float ZPlane();
+            ElementPtr find(const std::string& name);
+            ElementPtr get(int index);
     };
 }
 

@@ -15,7 +15,7 @@
 using namespace BasicGL;
 using namespace std;
 
-Element::Element(Elements element) : element(element)
+Element::Element(Elements element, const string name) : name(name), element(element)
 {
     assoc = NULL;
     visible = true;
@@ -107,6 +107,28 @@ void Element::init()
         default:
             break;
     }
+}
+
+ElementPtr Element::find(const string& name)
+{
+    if(this->name == name)
+        return this;
+
+    ElementPtr ret = NULL;
+    for(int i = 0; i < elements.size(); i++)
+    {
+        ret = elements[i]->find(name);
+        if(ret != NULL)
+            break;
+    }
+    return ret;
+}
+
+ElementPtr Element::get(int index)
+{
+    if(elements.size() > index)
+        return elements[index];
+    return NULL;
 }
 
 ElementPtr Element::reshape(int n, bool byElement)
@@ -546,14 +568,14 @@ void Element::hsvTorgb(float h, float s, float v, float *rgb)
     rgb[3] = 1.0f;
 }
 
-void Element::draw()
+void Element::draw(bool cartesian)
 {
     if(!visible)
         return;
     if(assoc != NULL)
     {
         glPushMatrix();
-        assoc->draw();
+        assoc->draw(cartesian);
         glPopMatrix();
     }
     int n = 0;
@@ -642,9 +664,15 @@ void Element::draw()
 
     glPointSize(stroke);
     glLineWidth(stroke);
-    glTranslatef(position[0], position[1], position[2]);
+    if(cartesian)
+        glTranslatef(position[0], position[1], position[2]);
+    else
+        glTranslatef(position[0], -position[1], position[2]);
     glScalef(scales[0], scales[1], scales[2]);
-    glRotatef(57.2958f * rotation[0], 1.0f, 0.0f, 0.0f);
+    if(cartesian)
+        glRotatef( 57.2958f * rotation[0], 1.0f, 0.0f, 0.0f);
+    else
+        glRotatef(-57.2958f * rotation[0], 1.0f, 0.0f, 0.0f);
     glRotatef(57.2958f * rotation[1], 0.0f, 1.0f, 0.0f);
     glRotatef(57.2958f * rotation[2], 0.0f, 0.0f, 1.0f);
 
@@ -671,7 +699,7 @@ void Element::draw()
     }
     else if(element == OBJECT)
     {
-        obj.draw(wireframe);
+        obj.draw(!wireframe, wireframe);
     }
     else
     {
@@ -776,7 +804,7 @@ void Element::draw()
             }
         }
         glPushMatrix();
-        elements[i]->draw();
+        elements[i]->draw(cartesian);
         glPopMatrix();
     }
 }

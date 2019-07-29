@@ -5,7 +5,7 @@
 using namespace BasicGL;
 using namespace std;
 
-Plot::Plot(int rows, int cols, int index) : Element(CONTAINER), rows(rows), cols(cols), index(index)
+Plot::Plot(int rows, int cols, int index, const string name) : Element(CONTAINER, name), rows(rows), cols(cols), index(index)
 {
     axisMinX = axisMinY = -1;
     axisMaxX = axisMaxY = 1;

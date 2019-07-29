@@ -30,6 +30,7 @@ static void computeSmoothingNormals(const tinyobj::attrib_t& attrib, const tinyo
 OBJ::OBJ()
 {
     loaded = false;
+    flipYZ = true;
     materialsId = -1;
 }
 
@@ -358,23 +359,30 @@ bool OBJ::load(const std::string& fileName)
                     buffer.push_back(n[k][1]);
                     buffer.push_back(n[k][2]);
                     // Combine normal and diffuse to get color.
-                    float normal_factor = 0.2;
-                    float diffuse_factor = 1 - normal_factor;
-                    float c[3] = {n[k][0] * normal_factor + diffuse[0] * diffuse_factor,
-                    n[k][1] * normal_factor + diffuse[1] * diffuse_factor,
-                    n[k][2] * normal_factor + diffuse[2] * diffuse_factor};
-                    float len2 = c[0] * c[0] + c[1] * c[1] + c[2] * c[2];
-                    if (len2 > 0.0f) 
-                    {
-                        float len = sqrtf(len2);
+                    // float normal_factor = 0.2;
+                    // float normal_factor = 0.0;
+                    // float diffuse_factor = 1 - normal_factor;
+                    // float c[3] = 
+                    // {
+                    //     n[k][0] * normal_factor + diffuse[0] * diffuse_factor,
+                    //     n[k][1] * normal_factor + diffuse[1] * diffuse_factor,
+                    //     n[k][2] * normal_factor + diffuse[2] * diffuse_factor
+                    // };
+                    // float len2 = c[0] * c[0] + c[1] * c[1] + c[2] * c[2];
+                    // if (len2 > 0.0f) 
+                    // {
+                    //     float len = sqrtf(len2);
 
-                        c[0] /= len;
-                        c[1] /= len;
-                        c[2] /= len;
-                    }
-                    buffer.push_back(c[0] * 0.5 + 0.5);
-                    buffer.push_back(c[1] * 0.5 + 0.5);
-                    buffer.push_back(c[2] * 0.5 + 0.5);
+                    //     c[0] /= len;
+                    //     c[1] /= len;
+                    //     c[2] /= len;
+                    // }
+                    // buffer.push_back(c[0] * 0.5 + 0.5);
+                    // buffer.push_back(c[1] * 0.5 + 0.5);
+                    // buffer.push_back(c[2] * 0.5 + 0.5);
+                    buffer.push_back(diffuse[0]);
+                    buffer.push_back(diffuse[1]);
+                    buffer.push_back(diffuse[2]);
 
                     buffer.push_back(tc[k][0]);
                     buffer.push_back(tc[k][1]);
@@ -471,16 +479,19 @@ void OBJ::free()
     loaded = false;
 }
 
-void OBJ::draw(bool wireframe)
+void OBJ::draw(bool solid, bool wireframe)
 {
     if(!available())
         return;
     
-    glScalef(normalizedScale, normalizedScale, normalizedScale);
+    if(flipYZ)
+        glScalef(-normalizedScale, normalizedScale, -normalizedScale);
+    else
+        glScalef(normalizedScale, normalizedScale, normalizedScale);
     glTranslatef(normalizedPosition[0], normalizedPosition[1], normalizedPosition[2]);
 
     GLsizei stride = (3 + 3 + 3 + 2) * sizeof(float);
-    if(!wireframe)
+    if(solid)
     {
         std::vector<tinyobj::material_t>& materials = materialList[materialsId];
 
@@ -526,7 +537,8 @@ void OBJ::draw(bool wireframe)
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         }
     }
-    else
+
+    if(wireframe)
     {
         // draw wireframe
         glDisable(GL_POLYGON_OFFSET_FILL);

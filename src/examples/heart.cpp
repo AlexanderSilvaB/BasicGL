@@ -14,7 +14,7 @@ float ABS(float x)
 
 void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
 {
-    ElementPtr heart = elements[0];
+    ElementPtr heart = elements.front();
     float scale = 0.5f + 0.5f*ABS(sin(2 * M_PI * window->timeSinceBegin));
     heart->scaleTo( scale );
 }

@@ -101,17 +101,16 @@ void Manager::SetCartesian(bool cartesian)
     windows[currentWindow].cartesian = cartesian;
 }
 
-Element* Manager::CreateElement(Elements element, bool addToDrawer)
+Element* Manager::CreateElement(Elements element, const string name)
 {
-    Element* el = new Element(element);
-    if(addToDrawer)
-        windows[currentWindow].elements.push_back(el);
+    Element* el = new Element(element, name);
+    windows[currentWindow].elements.push_back(el);
     return el;
 }
 
-Plot* Manager::CreatePlot(int rows, int cols, int index)
+Plot* Manager::CreatePlot(int rows, int cols, int index, const string name)
 {
-    Plot* plt = new Plot(rows, cols, index);
+    Plot* plt = new Plot(rows, cols, index, name);
     windows[currentWindow].elements.push_back(plt);
     return plt;
 }
@@ -182,6 +181,21 @@ int Manager::WindowIndex()
         }
     }
     return index;
+}
+
+WindowPtr Manager::CurrentWindow()
+{
+    return &windows[currentWindow];
+}
+
+ElementPtr Manager::find(const string& name)
+{
+    return windows[currentWindow].find(name);
+}
+
+ElementPtr Manager::get(int index)
+{
+    return windows[currentWindow].get(index);
 }
 
 void Manager::Resize(GLsizei w, GLsizei h)
@@ -414,6 +428,8 @@ void Manager::Render()
     
     Window& window = windows[index];
 
+    bool cartesian = window.cartesian;
+
     int mode = GL_COLOR_BUFFER_BIT;
     if(window.mode == MODE_3D)
         mode |= GL_DEPTH_BUFFER_BIT;
@@ -436,7 +452,7 @@ void Manager::Render()
     for(int i = 0; i < window.elements.size(); i++)
     {
         glPushMatrix();
-        window.elements[i]->draw();
+        window.elements[i]->draw(cartesian);
         glPopMatrix();
     }
     glutSwapBuffers();

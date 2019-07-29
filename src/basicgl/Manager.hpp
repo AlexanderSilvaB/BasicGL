@@ -32,8 +32,12 @@ namespace BasicGL
             static float WindowWidth();
             static float WindowHeight();
 
-            static Element* CreateElement(Elements element, bool addToDrawer = true);
-            static Plot* CreatePlot(int rows = 1, int cols = 1, int index = 1);
+            static WindowPtr CurrentWindow();
+            static ElementPtr find(const std::string& name);
+            static ElementPtr get(int index);
+
+            static Element* CreateElement(Elements element, const std::string name = "");
+            static Plot* CreatePlot(int rows = 1, int cols = 1, int index = 1, const std::string name = "");
 
             static void Show();
             static void Pause(float seconds = 0);
