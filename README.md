@@ -22,10 +22,6 @@ Uses the container element to pack shapes together: [snowman.cpp](src/examples/s
 
 Uses the container element to pack shapes together: [snowman.cpp](src/examples/snowman.cpp)
 
-![Snowman example](docs/images/snowman.PNG?raw=true "Snowman")
-
-Allows drawing using the mouse and keyboard features: [paint.cpp](src/examples/paint.cpp)
-
 ![Paint example](docs/images/paint.PNG?raw=true "Paint")
 
 A simple OBJ viewer with zoom, translation and rotation capabilities: [viewer.cpp](src/examples/viewer.cpp)
