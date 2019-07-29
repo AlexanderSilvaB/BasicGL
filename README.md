@@ -89,13 +89,13 @@ int main(int argc, char *argv[])
     // Initialize the BasicGL library
     Manager::Init(argc, argv);
 
-    // Create a new window in 3D mode named Teapot
+    // Creates a new window in 3D mode named Teapot
     Manager::CreateWindow("Teapot", MODE_3D);
 
     // Sets the rotate function as the animation function for the window
     Manager::SetAnimationFunction(rotate);
 
-    // Create a new element of type TEAPOT and also named teapot
+    // Creates a new element of type TEAPOT and also named teapot
     Manager::CreateElement(TEAPOT, "teapot");
 
     // Shows the window
