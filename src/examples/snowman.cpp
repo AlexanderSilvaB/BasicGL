@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
 
-    Manager::CreateWindow("SnowMan", MODE_3D);
+    Manager::CreateWindow("Snowman", MODE_3D);
     Manager::SetAnimationFunction(rotate);
 
     ElementPtr snowman = Manager::CreateElement(CONTAINER, "snowman");
