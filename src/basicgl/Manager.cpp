@@ -25,7 +25,6 @@ void Manager::Init(int argc, char *argv[])
 {
     if(!initialized)
     {
-        atexit (Destroy);
         glutInit(&argc, argv);
         initialized = true;
     }
@@ -50,6 +49,7 @@ int Manager::CreateWindow(const char *name, Modes mode, int width, int height, i
     if(x >= 0 && y >= 0)
         glutInitWindowPosition( x, y );
     int _window = glutCreateWindow( name );
+    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 
     currentWindow = windows.size();
     Window window;
