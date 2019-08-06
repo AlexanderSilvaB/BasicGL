@@ -27,8 +27,6 @@ Element::Element(Elements element, const string name) : name(name), element(elem
     color[0] = color[1] = color[2] = color[3] = 1.0f;
     data = NULL;
     text = "";
-    font = Default8x13;
-    alignment = Left;
     applyColors = true;
     solid = NULL;
     init();
@@ -416,77 +414,47 @@ ElementPtr Element::circle(float x, float y, float z, float r)
     return this;
 }
 
-ElementPtr Element::setText(const string& text, Fonts font)
+ElementPtr Element::setText(const string& text)
 {
     this->text = text;
-    this->font = font;
+    return this;
 }
 
-float Element::getTextWidth()
+ElementPtr Element::setText(const string& text, DefaultFonts defaultFont)
 {
-    const unsigned char* txt = (unsigned char*)text.c_str();
-    return glutBitmapLength(getFont(), txt);
-}
-
-float Element::getTextHeight()
-{
-    float ret = 13;
-    switch(font)
-    {
-        case Default8x13:
-            ret = 13;
-            break;
-        case Default9x15:
-            ret = 15;
-            break;
-        case TimesRoman10:
-            ret = 10;
-            break;
-        case TimesRoman24:
-            ret = 24;
-            break;
-        case Helvetica10:
-            ret = 10;
-            break;
-        case Helvetica12:
-            ret = 12;
-            break;
-        case Helvetica18:
-            ret = 18;
-            break;
-        default:
-            break;
-    }
-    return ret;
+    this->text = text;
+    font.setDefaultFont(defaultFont);
+    return this;
 }
 
 ElementPtr Element::textAlign(int alignment)
 {
-    this->alignment = alignment;
+    this->font.alignment = alignment;
+    return this;
 }
 
-ElementPtr Element::glow()
+ElementPtr Element::glow(float start, float scale)
 {
     float random = rand() % 360;
     hsvTorgb(random, 1.0f, 1.0f, color);
 
-    float step = 360.0f / points.size();
+    float step = scale * (360.0f / points.size());
     for(int i = 0; i < points.size(); i++)
     {
-        hsvTorgb(step*i, 1.0f, 1.0f, points.getColor(i).data);
+        hsvTorgb(step*i + start, 1.0f, 1.0f, points.getColor(i).data);
     }
     return this;
 }
 
-ElementPtr Element::glow(int index, int pos)
+ElementPtr Element::glowAt(int index, int pos)
 {
     if(index < points.size())
     {
         float random;
         if(pos < 0)
-            random = rand() % 360;
+            random = rand();
         else
-            random = pos % 360;
+            random = pos;
         hsvTorgb(random, 1.0f, 1.0f, points.getColor(index).data);
     }
     return this;
@@ -529,40 +497,10 @@ float Element::map(float v, float minIn, float maxIn, float minOut, float maxOut
     return (v - minIn) * (maxOut - minOut) / (maxIn - minIn) + minOut;
 }
 
-void* Element::getFont()
-{
-    void* ret = GLUT_BITMAP_8_BY_13;
-    switch(font)
-    {
-        case Default8x13:
-            ret = GLUT_BITMAP_8_BY_13;
-            break;
-        case Default9x15:
-            ret = GLUT_BITMAP_9_BY_15;
-            break;
-        case TimesRoman10:
-            ret = GLUT_BITMAP_TIMES_ROMAN_10;
-            break;
-        case TimesRoman24:
-            ret = GLUT_BITMAP_TIMES_ROMAN_24;
-            break;
-        case Helvetica10:
-            ret = GLUT_BITMAP_HELVETICA_10;
-            break;
-        case Helvetica12:
-            ret = GLUT_BITMAP_HELVETICA_12;
-            break;
-        case Helvetica18:
-            ret = GLUT_BITMAP_HELVETICA_18;
-            break;
-        default:
-            break;
-    }
-    return ret;
-}
-
 void Element::hsvTorgb(float h, float s, float v, float *rgb)
 {
+    h = fmod(h, 360.0f);
+
     float c = v*s;
     float h_ = h/60.0f;
     float x = c*(1 - abs( fmod(h_, 2) - 1));
@@ -586,6 +524,16 @@ void Element::hsvTorgb(float h, float s, float v, float *rgb)
     rgb[1] = g1 + m;
     rgb[2] = b1 + m;
     rgb[3] = 1.0f;
+}
+
+float Element::getTextWidth()
+{
+    return font.getTextWidth(text);
+}
+
+float Element::getTextHeight()
+{
+    return font.getTextHeight(text);
 }
 
 void Element::draw(bool cartesian)
@@ -698,24 +646,8 @@ void Element::draw(bool cartesian)
 
     if(element == TEXT)
     {
-        float tx = 0, ty = 0, tz = 0;
-        if(alignment & CenterX)
-            tx = - (getTextWidth()/Manager::WindowWidth());
-        else if(alignment & Right)
-            tx = - 2*(getTextWidth()/Manager::WindowWidth());
-        if(alignment & CenterY)
-            ty = -0.5f*(getTextHeight()/Manager::WindowHeight());
-        else if(alignment & Top)
-            ty = -(getTextHeight()/Manager::WindowHeight());
-
-        glRasterPos3f(tx, ty, tz);
         glColor4fv(color);
-        int len = text.length();
-        void* font = getFont();
-        for (int i = 0; i < len; i++) 
-        {
-            glutBitmapCharacter(font, text[i]);
-        }
+        font.print(text, cartesian);
     }
     else if(element == OBJECT)
     {

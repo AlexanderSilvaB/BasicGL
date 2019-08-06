@@ -12,10 +12,11 @@ float ABS(float x)
     return -x;
 }
 
+float n = 0;
 void rotate(ElementsList elements, WindowPtr window, float ellapsedTime)
 {
     ElementPtr heart = elements.front();
-    float scale = 0.5f + 0.5f*ABS(sin(2 * M_PI * window->timeSinceBegin));
+    float scale = 0.5f + 0.5f*ABS(sin(M_PI * window->timeSinceBegin));
     heart->scaleTo( scale );
 }
 

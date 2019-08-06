@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <time.h>
+#include <stdio.h>
 
 namespace BasicGL
 {
@@ -25,6 +26,12 @@ namespace BasicGL
         private:
             int windowedX, windowedY, windowedWidth, windowedHeight;
             std::vector< ElementPtr > assocElements;
+            std::string saveFileName;
+            bool saveAsVideo;
+            bool captureFrame;
+            int fps;
+            unsigned char *frame;
+            FILE *fp;
         public:
             int id;
             int index;
@@ -38,7 +45,6 @@ namespace BasicGL
             bool cartesian;
             float width, height;
             float lastMouseX, lastMouseY;
-            std::string saveFileName;
         
             std::vector< ElementPtr > elements;
             AnimationFunction animationFunction;
@@ -58,6 +64,11 @@ namespace BasicGL
             float ZPlane();
             ElementPtr find(const std::string& name);
             ElementPtr get(int index);
+
+            bool Capture(const std::string& fileName);
+            bool StartRecording(const std::string& fileName, int fps = 60);
+            void StopRecording();
+            void CaptureFrame();
     };
 }
 

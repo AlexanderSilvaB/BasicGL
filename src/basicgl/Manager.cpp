@@ -6,9 +6,6 @@
 #include <cmath>
 #include <unistd.h>
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb/stb_image_write.h>
-
 using namespace BasicGL;
 using namespace std;
 
@@ -472,19 +469,20 @@ void Manager::Render()
     }
     glutSwapBuffers();
 
-    if(!window.saveFileName.empty())
-    {
-        int sz = window.width * window.height * 3;
-        uint8_t* data = new uint8_t[sz];
-        glReadPixels(0, 0, window.width, window.height, GL_RGB, GL_UNSIGNED_BYTE, data);
-        stbi_flip_vertically_on_write(1);
-        stbi_write_png(window.saveFileName.c_str(), window.width, window.height, 3, data, window.width*3);
-        delete[] data;
-        window.saveFileName = "";
-    }
+    window.CaptureFrame();
 }
 
-void Manager::Save(const std::string& fileName)
+bool Manager::Capture(const std::string& fileName)
 {
-    windows[currentWindow].saveFileName = fileName;
+    return windows[currentWindow].Capture(fileName);
+}
+
+bool Manager::StartRecording(const std::string& fileName, int fps)
+{
+    return windows[currentWindow].StartRecording(fileName, fps);
+}
+
+void Manager::StopRecording()
+{
+    windows[currentWindow].StopRecording();
 }

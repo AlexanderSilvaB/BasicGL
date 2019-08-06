@@ -47,7 +47,9 @@ namespace BasicGL
             static void SetFullscreen(bool enabled);
             static void ToggleFullscreen();
 
-            static void Save(const std::string& fileName);
+            static bool Capture(const std::string& fileName);
+            static bool StartRecording(const std::string& fileName, int fps = 60);
+            static void StopRecording();
         
         private:
             static std::vector< Window > windows;

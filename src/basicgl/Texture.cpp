@@ -59,7 +59,7 @@ void Texture::fill(const unsigned int width, const unsigned int height, const un
 
     if (bpp == 1) 
     {
-        gluBuild2DMipmaps( GL_TEXTURE_2D, 1, width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data );
+        gluBuild2DMipmaps( GL_TEXTURE_2D, 1, width, height, GL_RED, GL_UNSIGNED_BYTE, data );
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     }
     else if (bpp == 3) 
@@ -74,7 +74,7 @@ void Texture::fill(const unsigned int width, const unsigned int height, const un
     } 
     else 
     {
-        assert(0);  // TODO
+        assert(0);
     }
 
     this->width = width;

@@ -24,6 +24,7 @@ This is a simple framework which allows to create simple OpenGL apps without muc
 * Complex 3D shapes (polygon, teapot)
 * Container elements
 * Text support
+* True Type fonts support
 * Data plotting
 * Automatic rainbow colors generation
 * Animations
@@ -31,11 +32,10 @@ This is a simple framework which allows to create simple OpenGL apps without muc
 * Automatic texture maps generation
 * OBJ files
 * Rotate, translate and scale any element
-* Screen image capture
+* Screen image/video capture
+
 
 ## To-do
-- [ ] True Type fonts
-- [ ] Screen video capture
 - [ ] Lighting
 - [ ] Android and iOS support
 - [ ] Better plot features

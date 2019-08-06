@@ -13,11 +13,13 @@ set(SRC Camera.cpp
         Point.cpp
         Texture.cpp
         OBJ.cpp
+        Font.cpp
         Element.cpp
         Serie.cpp
         Plot.cpp
         Window.cpp
-        Manager.cpp )
+        Manager.cpp 
+        external/jo_mpeg/jo_mpeg.cpp)
 
 add_library(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )

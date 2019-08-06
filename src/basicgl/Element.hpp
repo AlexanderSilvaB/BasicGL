@@ -5,6 +5,7 @@
 #include "Elements.hpp"
 #include "Texture.hpp"
 #include "OBJ.hpp"
+#include "Font.hpp"
 #include <float.h>
 #include <vector>
 #include <string>
@@ -17,15 +18,6 @@
 
 namespace BasicGL
 {
-    enum Fonts { Default8x13, Default9x15, TimesRoman10, TimesRoman24, Helvetica10, Helvetica12, Helvetica18 };
-    
-    #define Left 1
-    #define CenterX 2
-    #define Right 4
-    #define Top 8
-    #define CenterY 16
-    #define Bottom 32
-
     class Element;
 
     typedef Element* ElementPtr;
@@ -40,7 +32,6 @@ namespace BasicGL
             void init();
             static void hsvTorgb(float h, float s, float v, float *rgb);
             static float map(float v, float minIn, float maxIn, float minOut, float maxOut);
-            void* getFont();
         public:
             std::string name;
             bool visible;
@@ -52,11 +43,11 @@ namespace BasicGL
             float color[4];
             bool applyColors;
             std::string text;
-            Fonts font;
-            int alignment;
+
             ElementPtr assoc;
             Texture texture;
             OBJ obj;
+            Font font;
 
             PointList points;
             std::vector< ElementPtr > elements;
@@ -86,11 +77,8 @@ namespace BasicGL
             virtual ElementPtr rgb(unsigned char r, unsigned char g = 0, unsigned char b = 0, unsigned char a = 255);
             virtual ElementPtr rgb(float r, float g = 0.0f, float b = 0.0f, float a = 1.0f);
             virtual ElementPtr setWireframe(bool wireframe);
-            virtual ElementPtr setText(const std::string& text, Fonts font = Default8x13);
-
-            float getTextWidth();
-            float getTextHeight();
-            ElementPtr textAlign(int alignmenet);
+            virtual ElementPtr setText(const std::string& text);
+            virtual ElementPtr setText(const std::string& text, DefaultFonts defaultFont);
 
             int newPoint(float x, float y, float z);
 
@@ -104,9 +92,13 @@ namespace BasicGL
             ElementPtr rectangle(float x1, float y1, float z1, float x2, float y2, float z2, int index = 0);
             ElementPtr circle(float x, float y, float r);
             ElementPtr circle(float x, float y, float z, float r);
-            ElementPtr glow();
-            ElementPtr glow(int index, int pos = -1);
+            ElementPtr glow(float start = 0, float scale = 1.0f);
+            ElementPtr glowAt(int index, int pos = -1);
             ElementPtr map();
+            ElementPtr textAlign(int alignment);
+
+            float getTextWidth();
+            float getTextHeight();
 
             void invalidate();
             void draw(bool cartesian);

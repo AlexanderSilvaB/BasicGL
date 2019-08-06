@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     rect->texture.load("../src/examples/data/mario.bmp");
     rect->applyColors = false;
 
-    Manager::Save("texture.png");
+    Manager::Capture("texture.png");
 
     Manager::Show();
     Manager::Destroy();
