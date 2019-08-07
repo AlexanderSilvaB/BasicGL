@@ -48,7 +48,7 @@ void Manager::Destroy()
 
 int Manager::Create(const string& name, Modes mode, int fps, int width, int height, int x, int y)
 {
-    unsigned int _mode = GLUT_DOUBLE | GLUT_RGB;
+    unsigned int _mode = GLUT_DOUBLE | GLUT_RGBA;
     if(mode == MODE_3D)
         _mode |= GLUT_DEPTH;
     glutInitDisplayMode( _mode ); 
@@ -87,6 +87,9 @@ int Manager::Create(const string& name, Modes mode, int fps, int width, int heig
     glutTimerFunc(window.animationTime, Timer, currentWindow);
     // glutTimerFunc(33, Timer, currentWindow);
     glutCloseFunc(Closed);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
@@ -176,7 +179,7 @@ void Manager::Pause(float seconds)
 
 LightSourcePtr Manager::CreateLightSource()
 {
-    if(windows[currentWindow].lightSources.size() >= 7)
+    if(windows[currentWindow].lightSources.size() >= 8)
         return NULL;
 
     LightSource light;

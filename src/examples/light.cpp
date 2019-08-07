@@ -8,14 +8,16 @@ void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
     ElementPtr teapot = window->get(0);
     LightSourcePtr light = window->getLightSource(0);
 
-    light->moveTo(0.0f, 0.0f, 1.0f);
-    light->rotateAroundY( teapot, M_PI * ellasedTime );
+    light->moveTo(0.0f, 0.0f, 1.0f)->rotateAroundY( teapot, M_PI * ellasedTime );
     light->update();
 }
 
 void keyboard(Keyboard keyboard, WindowPtr window)
 {
-    window->getLightSource(0)->glow();
+    if(keyboard.key == ' ')
+        window->getLightSource(0)->toggleDirectional();
+    else
+        window->getLightSource(0)->glow();
 }
 
 int main(int argc, char *argv[])

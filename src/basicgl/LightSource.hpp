@@ -33,9 +33,14 @@ namespace BasicGL
             void apply(unsigned int index, bool cartesian);
             void update();
 
+            LightSourcePtr setPositional();
+            LightSourcePtr setDirectional();
+            bool IsDirectional();
+            LightSourcePtr toggleDirectional();
+
             virtual LightSourcePtr rgb(unsigned char r, unsigned char g = 0, unsigned char b = 0, unsigned char a = 255);
             virtual LightSourcePtr rgb(float r, float g = 0.0f, float b = 0.0f, float a = 1.0f);
-            LightSourcePtr glow();
+            virtual LightSourcePtr glow();
 
             virtual LightSourcePtr translate(float x = 0, float y = 0, float z = 0);
             virtual LightSourcePtr moveTo(float x = 0, float y = 0, float z = 0);

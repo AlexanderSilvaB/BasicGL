@@ -157,8 +157,6 @@ void Font::print(const string& text, bool flip)
         if(flip)
             glScalef(1.0f, -1.0f, 1.0f);
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, texture);
         glBegin(GL_QUADS);

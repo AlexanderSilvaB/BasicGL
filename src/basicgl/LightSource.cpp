@@ -72,6 +72,30 @@ void LightSource::apply(unsigned int index, bool cartesian)
     updated = true;
 }
 
+LightSourcePtr LightSource::setPositional()
+{
+    position[3] = 1.0f;
+}
+
+LightSourcePtr LightSource::setDirectional()
+{
+    position[3] = 0.0f;
+}
+
+bool LightSource::IsDirectional()
+{
+    return position[3] == 0.0f;
+}
+
+LightSourcePtr LightSource::toggleDirectional()
+{
+    if(IsDirectional())
+        setPositional();
+    else
+        setDirectional();
+    return this;
+}
+
 LightSourcePtr LightSource::rgb(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     diffuse[0] = r/255.0f;
