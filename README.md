@@ -62,7 +62,8 @@ void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
     /* 
         Select the first element of the window.
         As there's just one element (teapot), it will be the element of index = 0
-        The element can also be selected using the elements parameter or the find function of the window
+        The element can also be selected using the elements parameter (elements[0]) 
+        or the find function of the window (window->find("teapot"))
     */
     ElementPtr teapot = window->get(0);
 
