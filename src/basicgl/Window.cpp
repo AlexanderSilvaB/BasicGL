@@ -16,6 +16,8 @@ Window::Window()
     bg[0] = bg[1] = bg[2] = 0.0f;
     bg[3] = 1.0f;
     animationFunction = NULL;
+    keyboardFunction = NULL;
+    mouseFunction = NULL;
     timeSinceBegin = 0;
     cartesian = true;
     memset(&lastTime, '\0', sizeof(lastTime));
@@ -32,6 +34,7 @@ Window::Window()
     fps = 30;
     frame = NULL;
     fp = NULL;
+    animationTime = 30;
 }
 
 Window::~Window()

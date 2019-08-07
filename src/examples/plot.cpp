@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
 
-    Manager::CreateWindow("Plot", MODE_2D);
+    Manager::Create("Plot", MODE_2D);
     Manager::SetBackground(13, 40, 53);
 
     PlotPtr plt = Manager::CreatePlot();

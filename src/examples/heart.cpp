@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
 
-    Manager::CreateWindow("Heart", MODE_2D);
+    Manager::Create("Heart", MODE_2D);
     Manager::SetBackground(13, 40, 53);
     Manager::SetAnimationFunction(rotate);
 

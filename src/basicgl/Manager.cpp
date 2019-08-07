@@ -1,10 +1,22 @@
 #include "Manager.hpp"
+
+#ifdef WIN32
+#include <GL/glew.h>
+#include <GL/wglew.h>
+#endif
+
+#define GL_GLEXT_PROTOTYPES
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
 #include <GL/gl.h>
+
 #include <iostream>
 #include <cmath>
+#ifdef WIN32
+#include "win_unistd.h"
+#else
 #include <unistd.h>
+#endif
 
 using namespace BasicGL;
 using namespace std;
@@ -34,7 +46,7 @@ void Manager::Destroy()
     windows.clear();
 }
 
-int Manager::CreateWindow(const char *name, Modes mode, int width, int height, int x, int y)
+int Manager::Create(const string& name, Modes mode, int fps, int width, int height, int x, int y)
 {
     unsigned int _mode = GLUT_DOUBLE | GLUT_RGB;
     if(mode == MODE_3D)
@@ -45,8 +57,12 @@ int Manager::CreateWindow(const char *name, Modes mode, int width, int height, i
         glutInitWindowSize( width, height );
     if(x >= 0 && y >= 0)
         glutInitWindowPosition( x, y );
-    int _window = glutCreateWindow( name );
+    int _window = glutCreateWindow( name.c_str() );
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
+
+	#ifdef WIN32
+	glewInit();
+	#endif
 
     currentWindow = windows.size();
     Window window;
@@ -56,16 +72,20 @@ int Manager::CreateWindow(const char *name, Modes mode, int width, int height, i
     window.mode = mode;
     window.timeSinceBegin = 0;
     window.opened = true;
+    window.animationTime = (1000 / fps);
+
     windows.push_back(window);
 
-    glutIdleFunc(Render);
+    //glutIdleFunc(Render);
+    glutDisplayFunc(Render);
     glutReshapeFunc(Resize);
     glutKeyboardFunc(KeyboardNormal);
     glutSpecialFunc(KeyboardSpecial);
     glutMouseFunc(MouseButtons);
     glutMotionFunc(MouseMotion);
     glutEntryFunc(MouseEntry);
-    glutTimerFunc(33, Timer, currentWindow);
+    glutTimerFunc(window.animationTime, Timer, currentWindow);
+    // glutTimerFunc(33, Timer, currentWindow);
     glutCloseFunc(Closed);
 
     glEnable(GL_NORMALIZE);
@@ -74,12 +94,10 @@ int Manager::CreateWindow(const char *name, Modes mode, int width, int height, i
     glEnable(GL_LIGHT0);
     //const float lightPos[4] = {1, .5, 1, 0};
     //glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-    glEnable(GL_DEPTH_TEST);
-}
+	if (mode == MODE_3D)
+		glEnable(GL_DEPTH_TEST);
 
-int Manager::CreateWindow(const string name, Modes mode, int width, int height, int x, int y)
-{
-    return CreateWindow(name.c_str(), mode, width, height, x, y);
+	return currentWindow;
 }
 
 void Manager::SelectWindow(int index)
@@ -157,7 +175,7 @@ void Manager::Pause(float seconds)
 
 bool Manager::IsFullscreen()
 {
-    windows[currentWindow].IsFullscreen();
+    return windows[currentWindow].IsFullscreen();
 }
 
 void Manager::SetFullscreen(bool enabled)
@@ -418,8 +436,9 @@ void Manager::Timer(int index)
         window.animationFunction(window.elements, &window, secs);
 
     now(window.lastTime);
-
-    glutTimerFunc(33, Timer, index);
+    
+    glutTimerFunc(window.animationTime, Timer, index);
+    // glutTimerFunc(33, Timer, index);
 }
 
 void Manager::Closed()
@@ -468,6 +487,7 @@ void Manager::Render()
         glPopMatrix();
     }
     glutSwapBuffers();
+    glutPostRedisplay();
 
     window.CaptureFrame();
 }

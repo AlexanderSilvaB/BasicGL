@@ -43,11 +43,11 @@ void keyboardHandler(Keyboard keyboard, WindowPtr window)
 int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
-    Manager::CreateWindow("Paint", MODE_2D);
+    Manager::Create("Paint", MODE_2D);
     Manager::SetMouseFunction(mouseHandler);
     Manager::SetKeyboardFunction(keyboardHandler);
 
-    Manager::CreateElement(TEXT)->moveTo(0, -0.9)->textAlign(CenterX | CenterY)->setText("Press any key to change style");
+    Manager::CreateElement(TEXT)->moveTo(0, -0.9)->textAlign(Align_CenterX | Align_CenterY)->setText("Press any key to change style");
 
     Manager::Show();
     Manager::Destroy();

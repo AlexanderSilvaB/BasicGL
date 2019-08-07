@@ -14,7 +14,7 @@ void rotate(ElementsList elements, WindowPtr window, float ellasedTime)
 int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
-    Manager::CreateWindow("Obj", MODE_3D);
+    Manager::Create("Obj", MODE_3D);
     Manager::SetAnimationFunction(rotate);
 
     ElementPtr earth = Manager::CreateElement(OBJECT, "earth");

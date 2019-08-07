@@ -4,8 +4,12 @@
 #include <cstdlib>
 #include <iostream>
 
-#define GL_GLEXT_PROTOTYPES
+#ifdef WIN32
+#include <GL/glew.h>
+#include <GL/wglew.h>
+#endif
 
+#define GL_GLEXT_PROTOTYPES
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
 #include <GL/gl.h>
@@ -22,7 +26,7 @@ Font::Font()
 {
     isLoaded = false;
     defaultFont = Default8x13;
-    alignment = Left;
+    alignment = Align_Left;
     texture = 0;
     firstChar = ' ';
     lastChar = '~';
@@ -111,13 +115,13 @@ void Font::print(const string& text, bool flip)
     if(defaultFont != Custom)
     {
         float tx = 0, ty = 0, tz = 0;
-        if(alignment & CenterX)
+        if(alignment & Align_CenterX)
             tx = - (getTextWidth(text)/Manager::WindowWidth());
-        else if(alignment & Right)
+        else if(alignment & Align_Right)
             tx = - 2*(getTextWidth(text)/Manager::WindowWidth());
-        if(alignment & CenterY)
+        if(alignment & Align_CenterY)
             ty = -0.5f*(getTextHeight(text)/Manager::WindowHeight());
-        else if(alignment & Top)
+        else if(alignment & Align_Top)
             ty = -(getTextHeight(text)/Manager::WindowHeight());
 
         glDisable(GL_LIGHTING);
@@ -141,13 +145,13 @@ void Font::print(const string& text, bool flip)
         float sx = size * ( 1.0f / ( Manager::WindowWidth() * fontSize ) );
         float sy = size * ( 1.0f / ( Manager::WindowHeight() * fontSize ) );
 
-        if(alignment & CenterX)
+        if(alignment & Align_CenterX)
             x0 = -getTextWidth(text) / 2.0f;
-        else if(alignment & Right)
+        else if(alignment & Align_Right)
             x0 = - getTextWidth(text);
-        if(alignment & CenterY)
+        if(alignment & Align_CenterY)
             y0 = -getTextHeight(text) / 2.0f;
-        else if(alignment & Top)
+        else if(alignment & Align_Top)
             y0 = -getTextHeight(text);
 
         if(flip)
@@ -241,7 +245,7 @@ float Font::getTextWidth(const string& text)
     return max(w1, w2);
 }
 
-float Font::getTextHeight(const string& text)
+float Font::getTextHeight(const std::string& text)
 {
     float x = 0, y = 0, h, h1 = 0, h2 = 0;
     char c;

@@ -7,8 +7,12 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobjloader/tiny_obj_loader.h>
 
-#define GL_GLEXT_PROTOTYPES
+#ifdef WIN32
+#include <GL/glew.h>
+#include <GL/wglew.h>
+#endif
 
+#define GL_GLEXT_PROTOTYPES
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
 #include <GL/gl.h>
@@ -179,8 +183,8 @@ bool OBJ::load(const std::string& fileName)
         }
     }
 
-    bmin[0] = bmin[1] = bmin[2] = std::numeric_limits<float>::max();
-    bmax[0] = bmax[1] = bmax[2] = -std::numeric_limits<float>::max();
+    bmin[0] = bmin[1] = bmin[2] = (std::numeric_limits<float>::max)();
+    bmax[0] = bmax[1] = bmax[2] = -(std::numeric_limits<float>::max)();
 
     {
         for (size_t s = 0; s < shapes.size(); s++) 
@@ -272,12 +276,12 @@ bool OBJ::load(const std::string& fileName)
                     v[0][k] = attrib.vertices[3 * f0 + k];
                     v[1][k] = attrib.vertices[3 * f1 + k];
                     v[2][k] = attrib.vertices[3 * f2 + k];
-                    bmin[k] = std::min(v[0][k], bmin[k]);
-                    bmin[k] = std::min(v[1][k], bmin[k]);
-                    bmin[k] = std::min(v[2][k], bmin[k]);
-                    bmax[k] = std::max(v[0][k], bmax[k]);
-                    bmax[k] = std::max(v[1][k], bmax[k]);
-                    bmax[k] = std::max(v[2][k], bmax[k]);
+                    bmin[k] = min(v[0][k], bmin[k]);
+                    bmin[k] = min(v[1][k], bmin[k]);
+                    bmin[k] = min(v[2][k], bmin[k]);
+                    bmax[k] = max(v[0][k], bmax[k]);
+                    bmax[k] = max(v[1][k], bmax[k]);
+                    bmax[k] = max(v[2][k], bmax[k]);
                 }
 
                 float n[3][3];

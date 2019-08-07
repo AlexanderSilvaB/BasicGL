@@ -8,18 +8,18 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
-    Manager::CreateWindow("Text", MODE_2D);
+    Manager::Create("Text", MODE_2D);
     Manager::SetBackground(13, 40, 53);
 
     ElementPtr textDefault = Manager::CreateElement(TEXT);
     textDefault->setText("Hello World - Default9x15", Default9x15);
-    textDefault->textAlign(CenterX);
+    textDefault->textAlign(Align_CenterX);
     textDefault->translate(0, 0.2f);
     textDefault->rgb(1.0f, 0.0f, 0.0f);
 
     ElementPtr textCustom = Manager::CreateElement(TEXT);
     textCustom->setText("Hello World - TrueType(arial.ttf)");
-    textCustom->textAlign(CenterX);
+    textCustom->textAlign(Align_CenterX);
     textCustom->font.load("../src/examples/data/arial.ttf");
     textCustom->translate(0, -0.2f);
     textCustom->rgb(0.0f, 1.0f, 0.0f);

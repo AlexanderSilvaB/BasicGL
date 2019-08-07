@@ -29,6 +29,7 @@ This is a simple framework which allows to create simple OpenGL apps without muc
 * Automatic rainbow colors generation
 * Animations
 * Textures
+* Webcam/video to texture
 * Automatic texture maps generation
 * OBJ files
 * Rotate, translate and scale any element

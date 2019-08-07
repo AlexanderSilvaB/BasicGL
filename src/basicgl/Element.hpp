@@ -1,6 +1,7 @@
 #ifndef _BASIC_GL_ELEMENT_H_
 #define _BASIC_GL_ELEMENT_H_
 
+#define _USE_MATH_DEFINES
 #include "Point.hpp"
 #include "Elements.hpp"
 #include "Texture.hpp"
@@ -10,11 +11,6 @@
 #include <vector>
 #include <string>
 
-#define GL_GLEXT_PROTOTYPES
-
-#include <GL/freeglut.h>
-#include <GL/freeglut_ext.h>
-#include <GL/gl.h>
 
 namespace BasicGL
 {
@@ -26,7 +22,7 @@ namespace BasicGL
     {
         private:
             unsigned int vboIds[2];
-            GLUquadric *solid;
+            void *solid;
         protected:
             Elements element;
             void init();
@@ -41,6 +37,7 @@ namespace BasicGL
             float position[3];
             float rotation[3];
             float color[4];
+            bool flipped[3];
             bool applyColors;
             std::string text;
 
@@ -70,7 +67,11 @@ namespace BasicGL
             virtual ElementPtr rotateToX(float x = 0);
             virtual ElementPtr rotateToY(float y = 0);
             virtual ElementPtr rotateToZ(float z = 0);
+            virtual ElementPtr flipX(bool x = false);
+            virtual ElementPtr flipY(bool y = false);
+            virtual ElementPtr flipZ(bool z = false);
             virtual ElementPtr rotate(float x = 0, float y = 0, float z = 0);
+            virtual ElementPtr flip(bool x = false, bool y = false, bool z = false);
             virtual ElementPtr rotateTo(float x = 0, float y = 0, float z = 0);
             virtual ElementPtr scale(float x = 1.0f, float y = FLT_MIN, float z = FLT_MIN);
             virtual ElementPtr scaleTo(float x = 1.0f, float y = FLT_MIN, float z = FLT_MIN);

@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
 
-    Manager::CreateWindow("Teapot", MODE_3D);
+    Manager::Create("Teapot", MODE_3D);
 	Manager::SetAnimationFunction(rotate);
     Manager::SetKeyboardFunction(keyboard);
 

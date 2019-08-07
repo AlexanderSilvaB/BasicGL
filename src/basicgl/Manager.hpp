@@ -20,8 +20,7 @@ namespace BasicGL
             static void Init(int argc, char *argv[]);
             static void Destroy();
 
-            static int CreateWindow(const char *name, Modes mode = MODE_2D, int width = 0, int height = 0, int x = -1, int y = -1);
-            static int CreateWindow(const std::string name, Modes mode = MODE_2D, int width = 0, int height = 0, int x = -1, int y = -1);
+            static int Create(const std::string& name, Modes mode = MODE_2D, int fps = 30, int width = 0, int height = 0, int x = -1, int y = -1);
 
             static void SelectWindow(int index);
             static void SetBackground(float r, float g, float b, float a = 1.0f);

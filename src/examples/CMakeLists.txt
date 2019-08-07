@@ -36,3 +36,6 @@ target_link_libraries(obj basicgl)
 
 add_executable(viewer viewer.cpp)
 target_link_libraries(viewer basicgl)
+
+add_executable(webcam webcam.cpp)
+target_link_libraries(webcam basicgl)

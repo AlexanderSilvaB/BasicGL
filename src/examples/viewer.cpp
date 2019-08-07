@@ -47,15 +47,15 @@ int main(int argc, char *argv[])
     cout << "Viewing: " << objFile << endl;
 
     Manager::Init(argc, argv);
-    Manager::CreateWindow("Viewer", MODE_3D);
+    Manager::Create("Viewer", MODE_3D);
     Manager::SetMouseFunction(mouseHandler);
     Manager::SetKeyboardFunction(keyboardHandler);
 
     WindowPtr window = Manager::CurrentWindow();
     float zplane = window->ZPlane();
 
-    Manager::CreateElement(TEXT)->setText("Flip YZ: F")->textAlign(Left | Bottom)->moveTo(-1.0f, -0.9f, zplane);
-    Manager::CreateElement(TEXT)->setText("Enable/Disable translate: T")->textAlign(Left | Bottom)->moveTo(-1.0f, -1.0f, zplane);
+    Manager::CreateElement(TEXT)->setText("Flip YZ: F")->textAlign(Align_Left | Align_Bottom)->moveTo(-1.0f, -0.9f, zplane);
+    Manager::CreateElement(TEXT)->setText("Enable/Disable translate: T")->textAlign(Align_Left | Align_Bottom)->moveTo(-1.0f, -1.0f, zplane);
 
     ElementPtr object = Manager::CreateElement(OBJECT, "object");
     object->scaleTo(3.0f);

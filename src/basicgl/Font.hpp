@@ -8,12 +8,12 @@ namespace BasicGL
 {
     enum DefaultFonts { Default8x13, Default9x15, TimesRoman10, TimesRoman24, Helvetica10, Helvetica12, Helvetica18, Custom };
     
-    #define Left 1
-    #define CenterX 2
-    #define Right 4
-    #define Top 8
-    #define CenterY 16
-    #define Bottom 32
+    #define	Align_Left 1
+    #define Align_CenterX 2
+    #define Align_Right 4
+    #define Align_Top 8
+    #define Align_CenterY 16
+    #define Align_Bottom 32
 
     class Font
     {

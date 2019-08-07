@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
     Manager::Init(argc, argv);
 
-    Manager::CreateWindow("Robot", MODE_2D);
+    Manager::Create("Robot", MODE_2D);
     Manager::SetBackground(13, 40, 53);
 
     ElementPtr robot = Manager::CreateElement(CONTAINER);

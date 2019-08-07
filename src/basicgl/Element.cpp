@@ -4,10 +4,18 @@
 #include "Manager.hpp"
 #include <cmath>
 #include <iostream>
+#ifdef WIN32
+#include "win_unistd.h"
+#else
 #include <unistd.h>
+#endif
+
+#ifdef WIN32
+#include <GL/glew.h>
+#include <GL/wglew.h>
+#endif
 
 #define GL_GLEXT_PROTOTYPES
-
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
 #include <GL/gl.h>
@@ -23,6 +31,7 @@ Element::Element(Elements element, const string name) : name(name), element(elem
     scales[0] = scales[1] = scales[2] = 1.0f;
     position[0] = position[1] = position[2] = 0;
     rotation[0] = rotation[1] = rotation[2] = 0;
+    flipped[0] = flipped[1] = flipped[2] = false;
     stroke = 1.0f;
     color[0] = color[1] = color[2] = color[3] = 1.0f;
     data = NULL;
@@ -53,7 +62,7 @@ Element::~Element()
             break;
     }
     if(solid != NULL)
-        gluDeleteQuadric(solid);
+        gluDeleteQuadric((GLUquadric*)solid);
 }
 
 void Element::init()
@@ -117,9 +126,9 @@ void Element::init()
         case CYLINDER:
         case CONE:
             solid = gluNewQuadric();
-            gluQuadricDrawStyle(solid, GLU_FILL);
-            gluQuadricTexture(solid, GL_TRUE);
-            gluQuadricNormals(solid, GLU_SMOOTH);
+            gluQuadricDrawStyle((GLUquadric*)solid, GLU_FILL);
+            gluQuadricTexture((GLUquadric*)solid, GL_TRUE);
+            gluQuadricNormals((GLUquadric*)solid, GLU_SMOOTH);
             break;
         default:
             break;
@@ -231,6 +240,29 @@ ElementPtr Element::rotate(float x, float y, float z)
     rotation[0] += x;
     rotation[1] += y;
     rotation[2] += z;
+    return this;
+}
+
+ElementPtr Element::flipX(bool x)
+{
+    return flip(x, flipped[1], flipped[2]);
+}
+
+ElementPtr Element::flipY(bool y)
+{
+    return flip(flipped[0], y, flipped[2]);
+}
+
+ElementPtr Element::flipZ(bool z)
+{
+    return flip(flipped[0], flipped[1], z);
+}
+
+ElementPtr Element::flip(bool x, bool y, bool z)
+{
+    flipped[0] = x;
+    flipped[1] = y;
+    flipped[2] = z;
     return this;
 }
 
@@ -490,6 +522,7 @@ ElementPtr Element::map()
         y = map(points.Y(i), minY, maxY, 1.0f, 0.0f);
         points.map(i, x, y, 0);
     }
+	return this;
 }
 
 float Element::map(float v, float minIn, float maxIn, float minOut, float maxOut)
@@ -540,6 +573,7 @@ void Element::draw(bool cartesian)
 {
     if(!visible)
         return;
+    
     if(assoc != NULL)
     {
         glPushMatrix();
@@ -643,6 +677,7 @@ void Element::draw(bool cartesian)
         glRotatef(-57.2958f * rotation[0], 1.0f, 0.0f, 0.0f);
     glRotatef(57.2958f * rotation[1], 0.0f, 1.0f, 0.0f);
     glRotatef(57.2958f * rotation[2], 0.0f, 0.0f, 1.0f);
+    glScalef(flipped[0] ? -1.0f : 1.0f, flipped[1] ? -1.0f : 1.0f, flipped[2] ? -1.0f : 1.0f);
 
     if(element == TEXT)
     {
@@ -672,7 +707,7 @@ void Element::draw(bool cartesian)
                 glBufferData(GL_ARRAY_BUFFER, n * sizeof(PointColor), points.rawColor(), GL_STREAM_DRAW);
                 glColorPointer(4, GL_FLOAT, 0, 0);
             }
-
+            
             texture.draw(n, points.rawCoords());
         
             glDrawArrays(t, 0, n);
@@ -692,7 +727,7 @@ void Element::draw(bool cartesian)
                     if(wireframe)
                         glutWireSphere(1.0f, 20, 20);
                     else
-                        gluSphere(solid, 1.0f, 20, 20);
+                        gluSphere((GLUquadric*)solid, 1.0f, 20, 20);
                         // glutSolidSphere(1.0f, 20, 20);
                     break;
                 case CONE:
@@ -700,7 +735,7 @@ void Element::draw(bool cartesian)
                         glutWireCone(0.5f, 1.0f, 20, 20);
                     else
                         //glutSolidCone(0.5f, 1.0f, 20, 20);
-                        gluCylinder(solid, 0.5f, 0.0f, 1.0f, 20, 20);
+                        gluCylinder((GLUquadric*)solid, 0.5f, 0.0f, 1.0f, 20, 20);
                     break;
                 case CUBE:
                     if(wireframe)
@@ -720,7 +755,7 @@ void Element::draw(bool cartesian)
                         glutWireCylinder(0.5f, 1.0f, 20, 20);
                     else
                         //glutSolidCylinder(0.5f, 1.0f, 20, 20);
-                        gluCylinder(solid, 0.5f, 0.5f, 1.0f, 20, 20);
+                        gluCylinder((GLUquadric*)solid, 0.5f, 0.5f, 1.0f, 20, 20);
                     break;
                 case TEAPOT:
                     if(wireframe)

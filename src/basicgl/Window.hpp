@@ -38,6 +38,7 @@ namespace BasicGL
             int mode;
             bool opened;
             bool fullscren;
+            int animationTime;
             Camera camera;
             float bg[4];
             float timeSinceBegin;
