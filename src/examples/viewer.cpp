@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <basicgl/Manager.hpp>
+#include <cstdlib>
 
 using namespace BasicGL;
 using namespace std;

@@ -3,6 +3,7 @@
 
 #include "Window.hpp"
 #include "Element.hpp"
+#include "LightSource.hpp"
 #include "Plot.hpp"
 #include <vector>
 #include <string>
@@ -39,6 +40,8 @@ namespace BasicGL
 
             static Element* CreateElement(Elements element, const std::string name = "");
             static Plot* CreatePlot(int rows = 1, int cols = 1, int index = 1, const std::string name = "");
+            static LightSourcePtr CreateLightSource();
+            static LightSourcePtr GetLightSource(int index);
 
             static void Show();
             static void Pause(float seconds = 0);

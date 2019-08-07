@@ -23,6 +23,7 @@ This is a simple framework which allows to create simple OpenGL apps without muc
 * Complex 2D shapes (polygon, sequence, loop, connected triangles, connected rectangles, radial triangles )
 * Complex 3D shapes (polygon, teapot)
 * Container elements
+* Lighting
 * Text support
 * True Type fonts support
 * Data plotting
@@ -37,7 +38,6 @@ This is a simple framework which allows to create simple OpenGL apps without muc
 
 
 ## To-do
-- [ ] Lighting
 - [ ] Android and iOS support
 - [ ] Better plot features
 

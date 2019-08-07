@@ -113,6 +113,13 @@ ElementPtr Window::get(int index)
     return NULL;
 }
 
+LightSourcePtr Window::getLightSource(int index)
+{
+    if(index >= lightSources.size())
+        return NULL;
+    return &lightSources[index];
+}   
+
 bool Window::Capture(const std::string& fileName)
 {
     if(captureFrame)

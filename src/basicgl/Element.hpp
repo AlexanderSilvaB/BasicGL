@@ -26,7 +26,6 @@ namespace BasicGL
         protected:
             Elements element;
             void init();
-            static void hsvTorgb(float h, float s, float v, float *rgb);
             static float map(float v, float minIn, float maxIn, float minOut, float maxOut);
         public:
             std::string name;
@@ -103,6 +102,8 @@ namespace BasicGL
 
             void invalidate();
             void draw(bool cartesian);
+
+            static void hsvTorgb(float h, float s, float v, float *rgb);
     };
 }
 

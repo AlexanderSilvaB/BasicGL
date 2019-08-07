@@ -36,6 +36,7 @@ include_directories(external)
 
 set(SRC win_unistd.c
         Camera.cpp
+        LightSource.cpp
         Point.cpp
         Texture.cpp
         OBJ.cpp

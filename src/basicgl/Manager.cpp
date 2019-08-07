@@ -91,9 +91,10 @@ int Manager::Create(const string& name, Modes mode, int fps, int width, int heig
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    //const float lightPos[4] = {1, .5, 1, 0};
-    //glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    // glEnable(GL_LIGHT0);
+    // const float lightPos[4] = {1, .5, 1, 0};
+    // glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    CreateLightSource();
 	if (mode == MODE_3D)
 		glEnable(GL_DEPTH_TEST);
 
@@ -172,6 +173,24 @@ void Manager::Pause(float seconds)
     if(seconds > 0)
         usleep((useconds_t)(seconds * 1000000));
 }
+
+LightSourcePtr Manager::CreateLightSource()
+{
+    if(windows[currentWindow].lightSources.size() >= 7)
+        return NULL;
+
+    LightSource light;
+    windows[currentWindow].lightSources.push_back(light);
+
+    glEnable(GL_LIGHT0 + (windows[currentWindow].lightSources.size() - 1) );
+
+    return GetLightSource(windows[currentWindow].lightSources.size() - 1);
+}
+
+LightSourcePtr Manager::GetLightSource(int index)
+{
+    return windows[currentWindow].getLightSource(index);
+}   
 
 bool Manager::IsFullscreen()
 {
@@ -478,6 +497,13 @@ void Manager::Render()
         gluLookAt(  window.camera.position[0],                                  window.camera.position[1],                                  window.camera.position[2],
                     window.camera.position[0] + window.camera.translation[0],   window.camera.position[1] + window.camera.translation[1],   window.camera.position[2] + window.camera.translation[2],
                     0.0f, 1.0f, 0.0f);
+    }
+
+    for(unsigned int i = 0; i < window.lightSources.size(); i++)
+    {
+        glPushMatrix();
+        window.lightSources[i].apply(i, cartesian);
+        glPopMatrix();
     }
 
     for(int i = 0; i < window.elements.size(); i++)

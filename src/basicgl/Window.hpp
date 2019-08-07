@@ -5,6 +5,7 @@
 #include "Camera.hpp"
 #include "Keyboard.hpp"
 #include "Mouse.hpp"
+#include "LightSource.hpp"
 #include <vector>
 #include <string>
 #include <time.h>
@@ -48,6 +49,7 @@ namespace BasicGL
             float lastMouseX, lastMouseY;
         
             std::vector< ElementPtr > elements;
+            std::vector< LightSource > lightSources;
             AnimationFunction animationFunction;
             KeyboardFunction keyboardFunction;
             MouseFunction mouseFunction;
@@ -65,6 +67,8 @@ namespace BasicGL
             float ZPlane();
             ElementPtr find(const std::string& name);
             ElementPtr get(int index);
+
+            LightSourcePtr getLightSource(int index);
 
             bool Capture(const std::string& fileName);
             bool StartRecording(const std::string& fileName, int fps = 60);
