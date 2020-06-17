@@ -37,6 +37,7 @@ namespace BasicGL
             static WindowPtr CurrentWindow();
             static ElementPtr find(const std::string& name);
             static ElementPtr get(int index);
+            static int index(ElementPtr element);
 
             static Element* CreateElement(Elements element, const std::string name = "");
             static Plot* CreatePlot(int rows = 1, int cols = 1, int index = 1, const std::string name = "");

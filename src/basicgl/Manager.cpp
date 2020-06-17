@@ -1,4 +1,5 @@
 #include "Manager.hpp"
+#include <algorithm>
 
 #ifdef WIN32
 #include <GL/glew.h>
@@ -148,6 +149,18 @@ Plot* Manager::CreatePlot(int rows, int cols, int index, const string name)
     windows[currentWindow].assocElement(plt);
     return plt;
 }
+
+int Manager::index(ElementPtr element)
+{
+    std::vector<ElementPtr>::iterator it =
+        std::find(windows[currentWindow].elements.begin(), windows[currentWindow].elements.end(), element);
+    if (it != windows[currentWindow].elements.end())
+    {
+        return std::distance(windows[currentWindow].elements.begin(), it);
+    }
+    return -1;
+}
+
 
 void Manager::SetAnimationFunction(AnimationFunction animationFunction)
 {
