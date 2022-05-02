@@ -5,6 +5,8 @@ option(IMAGE_CAPTURE "Add support to capture images from file/devices" ON)
 
 include(GNUInstallDirs)
 
+cmake_policy(SET CMP0072 NEW)
+
 if(WIN32)
     list(APPEND CMAKE_PREFIX_PATH "C:/libs/glew-2.1.0")
     find_package(GLEW)
